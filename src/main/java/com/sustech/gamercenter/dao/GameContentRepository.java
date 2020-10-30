@@ -1,4 +1,4 @@
-package com.sustech.gamercenter.api;
+package com.sustech.gamercenter.dao;
 
 import com.sustech.gamercenter.model.GameContent;
 import org.springframework.data.jpa.repository.JpaRepository;

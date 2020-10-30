@@ -1,4 +1,4 @@
-package com.sustech.gamercenter.web;
+package com.sustech.gamercenter.controller;
 
 import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.model.GameDiscount;
@@ -13,7 +13,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/game")
-public class GameApp {
+public class GameController {
 
     @Autowired
     private GameService gameService;

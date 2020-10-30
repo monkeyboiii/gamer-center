@@ -1,8 +1,8 @@
 package com.sustech.gamercenter.service;
 
-import com.sustech.gamercenter.api.GameContentRepository;
-import com.sustech.gamercenter.api.GameDiscountRepository;
-import com.sustech.gamercenter.api.GameRepository;
+import com.sustech.gamercenter.dao.GameContentRepository;
+import com.sustech.gamercenter.dao.GameDiscountRepository;
+import com.sustech.gamercenter.dao.GameRepository;
 import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.model.GameContent;
 import com.sustech.gamercenter.model.GameDiscount;
