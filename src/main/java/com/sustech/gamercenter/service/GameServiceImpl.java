@@ -20,7 +20,7 @@ public class GameServiceImpl implements GameService{
     private GameRepository gameRepository;
 
     @Autowired
-    private GameContentRepository gameContentRespository;
+    private GameContentRepository gameContentRepository;
 
     @Autowired
     private GameDiscountRepository gameDiscountRepository;
@@ -42,7 +42,7 @@ public class GameServiceImpl implements GameService{
         g.setType(type);
         g.setGame_id(id);
 //        g.setGame(gameRepository.findById(id).get());
-        gameContentRespository.save(g);
+        gameContentRepository.save(g);
     }
 
     @Override
