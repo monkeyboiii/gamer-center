@@ -1,17 +1,8 @@
-server:
-  port: 8080
-
 spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: root
-    password: d4t4b4se
+  profiles:
+    active: debug
 
-  # Hot reload in dev
-  devtools:
-    add-properties: true
-
-mybatis:
-  mapper-locations:
-    - classpath:mapper/*.xml
-    - classpath*:com/**/mapper/*.xml
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      fail-on-empty-beans: false
