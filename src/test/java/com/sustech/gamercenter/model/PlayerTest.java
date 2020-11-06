@@ -9,14 +9,11 @@ public class PlayerTest {
 
     @Test
     public void UserGenerate() {
-        User user = new Player(1L,
+        User user = new User(1L,
                 "calvin",
                 "email@email.com",
                 "password.hashed",
-                "adpt",
-                true,
-                false,
-                new Timestamp(System.currentTimeMillis())
+                "adpt"
         );
 
         System.out.println(user);

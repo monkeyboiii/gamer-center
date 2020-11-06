@@ -44,9 +44,7 @@ public class UserServiceTest {
         User user = new User(id, name,
                 "email@email.com",
                 "password.hashed",
-                "adpt",
-                true, false,
-                new Timestamp(System.currentTimeMillis())
+                "adpt"
         );
 
         given(userDao.findById(user.getId())).willReturn(java.util.Optional.of(user));

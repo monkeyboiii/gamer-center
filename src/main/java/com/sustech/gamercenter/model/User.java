@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "users")
-@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -66,19 +66,17 @@ public class User {
     }
 
     // can be used at register
+    public User(String name, String email, String password, String role) {
+        this(name, email, password, role, false, false, new Timestamp(System.currentTimeMillis()));
+    }
+
+    // for test purposes
     public User(Long id, String name, String email, String password, String role) {
+        this(name, email, password, role);
         this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.is_online = false;
-        this.is_locked = false;
-        this.created_at = new Timestamp(System.currentTimeMillis());
     }
 
-    public User(int id, String name, String email, String password, String role, Boolean is_online, Boolean is_locked, Timestamp created_at) {
-        this.id = (long) id;
+    public User(String name, String email, String password, String role, Boolean is_online, Boolean is_locked, Timestamp created_at) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -87,18 +85,6 @@ public class User {
         this.is_locked = is_locked;
         this.created_at = created_at;
     }
-
-    public User(Long id, String name, String email, String password, String role, Boolean is_online, Boolean is_locked, Timestamp created_at) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.is_online = is_online;
-        this.is_locked = is_locked;
-        this.created_at = created_at;
-    }
-
 
     @Override
     public boolean equals(Object o) {

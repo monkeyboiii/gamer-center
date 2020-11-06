@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,26 +44,15 @@ public class UserController {
     }
 
 
-//    @PostMapping("/register")
-//    public JsonResponse register(@RequestParam("name") String name,
-//                                 @RequestParam("email") String email,
-//                                 @RequestParam("password") String password,
-//                                 @RequestParam("role") String role,
-//                                 @RequestParam("bio") String bio
-////                          @RequestParam("avatar") File avatar
-//    ) {
-//        logger.info(password);
-////        logger.info(String.valueOf(avatar.canRead()));
-//        return new JsonResponse(0, "Successful registered");
-//    }
-
-
     @PostMapping("/register")
-    public JsonResponse registerV2(@RequestPart("user") User user,
-                                   @RequestParam("avatar") File avatar
+    public JsonResponse register(@RequestParam("name") String name,
+                                 @RequestParam("email") String email,
+                                 @RequestParam("password") String password,
+                                 @RequestParam("role") String role
     ) {
-        logger.info(user.toString());
+        logger.info(password);
 //        logger.info(String.valueOf(avatar.canRead()));
+        userService.registerUser(new User(name,email,password,role));
         return new JsonResponse(0, "Successful registered");
     }
 
@@ -73,6 +61,5 @@ public class UserController {
     public JsonResponse logout(@RequestParam("token") String token) {
         // TODO
         return new JsonResponse(0, "Successfully logged out");
-        //return new JsonResponse(-1, "Wrong token");
     }
 }

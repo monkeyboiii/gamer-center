@@ -13,10 +13,7 @@ public class UserTest {
                 "calvin",
                 "email@email.com",
                 "password.hashed",
-                "adpt",
-                true,
-                false,
-                new Timestamp(System.currentTimeMillis())
+                "adpt"
         );
 
         System.out.println(user);

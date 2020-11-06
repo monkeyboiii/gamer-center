@@ -23,7 +23,6 @@ public class UserService {
             return result;
         } catch (Exception e) {
             log.info(e.toString(), e);
-//            throw new ServiceException("根据id查询时发生异常!");
             return new User();
 
         }
@@ -37,6 +36,12 @@ public class UserService {
     public User queryUserByEmail(String email) {
         User result = userDao.findByEmail(email);
         return result;
+    }
+
+    public Integer registerUser(User user) {
+        User res = userDao.save(user);
+        log.info(res.toString());
+        return 1;
     }
 
 
