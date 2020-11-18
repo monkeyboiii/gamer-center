@@ -2,7 +2,7 @@ package com.sustech.gamercenter.service;
 
 import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.model.GameContent;
-import com.sustech.gamercenter.model.GameDiscount;
+//import com.sustech.gamercenter.model.GameDiscount;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +18,7 @@ public interface GameService {
 
     boolean existedName(String name);
 
-    GameDiscount setDiscount(GameDiscount gameDiscount, long gameId);
+//    GameDiscount setDiscount(GameDiscount gameDiscount, long gameId);
 
     Game findById(long id);
 

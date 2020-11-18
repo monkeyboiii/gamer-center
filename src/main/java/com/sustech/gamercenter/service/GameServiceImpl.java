@@ -2,11 +2,11 @@ package com.sustech.gamercenter.service;
 
 import com.sustech.gamercenter.config.MyException;
 import com.sustech.gamercenter.dao.GameContentRepository;
-import com.sustech.gamercenter.dao.GameDiscountRepository;
+//import com.sustech.gamercenter.dao.GameDiscountRepository;
 import com.sustech.gamercenter.dao.GameRepository;
 import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.model.GameContent;
-import com.sustech.gamercenter.model.GameDiscount;
+//import com.sustech.gamercenter.model.GameDiscount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,8 +25,8 @@ public class GameServiceImpl implements GameService {
     @Autowired
     private GameContentRepository gameContentRepository;
 
-    @Autowired
-    private GameDiscountRepository gameDiscountRepository;
+//    @Autowired
+//    private GameDiscountRepository gameDiscountRepository;
 
     private UserService userService;
 
@@ -82,12 +82,12 @@ public class GameServiceImpl implements GameService {
     public boolean existedName(String name) {
         return gameRepository.findByName(name) != null;
     }
-
-    @Override
-    public GameDiscount setDiscount(GameDiscount gameDiscount, long gameId) {
-//        gameDiscount.setGame(gameRepository.findById(gameId).get());
-        return gameDiscountRepository.save(gameDiscount);
-    }
+//
+//    @Override
+//    public GameDiscount setDiscount(GameDiscount gameDiscount, long gameId) {
+////        gameDiscount.setGame(gameRepository.findById(gameId).get());
+//        return gameDiscountRepository.save(gameDiscount);
+//    }
 
     @Override
     public Game findById(long id) {
