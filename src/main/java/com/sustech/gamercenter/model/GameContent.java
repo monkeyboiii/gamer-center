@@ -34,7 +34,11 @@ public class GameContent {
         this.game_id = game_id;
     }
 
-//
+    public void setGameId(long game_id) {
+        this.game_id = game_id;
+    }
+
+    //
     public long getId() {
         return id;
     }
@@ -66,6 +70,5 @@ public class GameContent {
     public void setPath(String path) {
         this.path = path;
     }
-
 
 }

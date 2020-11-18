@@ -1,15 +1,24 @@
 package com.sustech.gamercenter.controller;
 
+import com.sustech.gamercenter.config.MyException;
 import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.model.GameDiscount;
 import com.sustech.gamercenter.service.GameService;
 import com.sustech.gamercenter.service.ResultService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/game")
@@ -18,43 +27,57 @@ public class GameController {
     @Autowired
     private GameService gameService;
 
+    @GetMapping("/info")
+    public Object getGame(@RequestParam("id") long id) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("game", gameService.findById(id));
+        map.put("game_content", gameService.findAllByGameId(id));
+        return ResultService.success(map);
+    }
 
     @PostMapping("/create")
-    public Object createGame(Game game){
-        if(gameService.existedName(game.getName())){
-            return ResultService.jsonResult(-1,"游戏名已存在", game);
+    public Object createGame(Game game) {
+        if (gameService.existedName(game.getName())) {
+            throw new MyException(1, "游戏名已存在");
         }
-        Game newGame = gameService.save(game);
-        return ResultService.jsonResult(0, "success", newGame);
+        return ResultService.success(gameService.save(game));
     }
 
     @PostMapping("/upload")
-    public Object upload(@RequestParam("id") long id, @RequestParam("upload_file") MultipartFile uploadPackage, @RequestParam("type")String type) throws IOException{
+    public Object fileUpload(@RequestParam("id") long id, @RequestParam("upload_file") MultipartFile uploadPackage, @RequestParam("type") String type) throws IOException {
         gameService.uploadFile(type, uploadPackage, id);
-        return ResultService.jsonResult(0, "success", "");
+        return ResultService.success("");
     }
 
 
     @PostMapping("/update")
-    public Object updateGame(@RequestParam long id, @RequestParam String name, @RequestParam double price,
-                             @RequestParam boolean is_announced, @RequestParam boolean is_downloadable,
-                             @RequestParam String description, @RequestParam long developer_id){
-        if(gameService.existedName(name)){
-            return ResultService.jsonResult(-1,"游戏名已存在", "");
+    public Object updateGame(Game game) {
+        if (gameService.existedName(game.getName())) {
+            throw new MyException(1, "游戏名已存在");
         }
-        Game game = new Game();
-        game.setId(id);
-        game.setName(name);
-        game.setPrice(price);
-        game.setIs_announced(is_announced);
-        game.setIs_downloadable(is_downloadable);
-        game.setDescription(description);
-        game.setDeveloper_id(developer_id);
-        return ResultService.jsonResult(0,"success",gameService.save(game));
+        return ResultService.success(gameService.save(game));
     }
 
-    @PostMapping("/discount")
-    public Object setDiscount(GameDiscount gameDiscount,@RequestParam("game_id") long gameId){
-        return ResultService.jsonResult(0, "success", gameService.setDiscount(gameDiscount, gameId));
+    @RequestMapping(value = "/getPhoto/{url:[a-zA-Z0-9_.]+}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @ResponseBody
+    public byte[] getPhoto(@PathVariable("url") String url) throws IOException {
+        return gameService.getFile(url, "image");
     }
+
+    @RequestMapping("/download")
+    public Object fileDownLoad(HttpServletResponse response, @RequestParam("name") String fileName,
+                               @RequestParam("type") String type) throws IOException {
+        gameService.download(response, fileName, type);
+        return ResultService.success("");
+    }
+
+    @RequestMapping("/purchase")
+    public Object purchase(@RequestParam("user_id") long userId, @RequestParam("game_id") long gameId) {
+        gameService.purchase(userId, gameId);
+        return ResultService.success("");
+    }
+//    @PostMapping("/discount")
+//    public Object setDiscount(GameDiscount gameDiscount, long id){
+//        return gameService.setDiscount(gameDiscount, id);
+//    }
 }

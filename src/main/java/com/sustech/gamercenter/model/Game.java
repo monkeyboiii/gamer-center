@@ -1,8 +1,12 @@
 package com.sustech.gamercenter.model;
 
 import com.sun.istack.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Entity
 public class Game {
@@ -11,46 +15,86 @@ public class Game {
     private long id;
     @NotNull
     private String name;
+
     private double price;
-    private boolean is_announced;
-    private boolean is_downloadable;
     private double score;
     private String description;
     private long developer_id;
+    private String tag;
+    private String branch;
 
-//    @OneToMany(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "game_id")
-//    private List<GameContent> gameContents;
-//
-//    @OneToMany(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "game_id")
-//    private List<GameDiscount> gameDiscounts;
-//
-//    public List<GameDiscount> getGameDiscounts() {
-//        return gameDiscounts;
-//    }
-//
-//    public void setGameDiscounts(List<GameDiscount> gameDiscounts) {
-//        this.gameDiscounts = gameDiscounts;
-//    }
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private String discount_start;
+    private String discount_end;
 
-    public long getDeveloper_id() {
+    private String announce_date;
+    private String release_date;
+
+    private double discount_rate;
+
+    public String getBranch() {
+        return branch;
+    }
+
+    public void setBranch(String branch) {
+        this.branch = branch;
+    }
+
+    public String getDiscountStart() {
+        return discount_start;
+    }
+
+    public void setDiscountStart(String discount_start) {
+        this.discount_start = discount_start;
+    }
+
+    public String getDiscountEnd() {
+        return discount_end;
+    }
+
+    public String getAnnounceDate() {
+        return announce_date;
+    }
+
+    public void setAnnounceDate(String announce_date) {
+        this.announce_date = announce_date;
+    }
+
+    public String getReleaseDate() {
+        return release_date;
+    }
+
+    public void setReleaseDate(String release_date) {
+        this.release_date = release_date;
+    }
+
+    public void setDiscountEnd(String discount_end) {
+        this.discount_end = discount_end;
+    }
+
+    public double getDiscountRate() {
+        return discount_rate;
+    }
+
+    public void setDiscountRate(double discount_rate) {
+        this.discount_rate = discount_rate;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public long getDeveloperId() {
         return developer_id;
     }
 
-    public void setDeveloper_id(long developer_id) {
+    public void setDeveloperId(long developer_id) {
         this.developer_id = developer_id;
     }
-//
-//    public List<GameContent> getGameContents() {
-//        return gameContents;
-//    }
-//
-//    public void setGameContents(List<GameContent> gameContents) {
-//        this.gameContents = gameContents;
-//    }
-//
-
 
     public long getId() {
         return id;
@@ -74,22 +118,6 @@ public class Game {
 
     public void setPrice(double price) {
         this.price = price;
-    }
-
-    public boolean isIs_announced() {
-        return is_announced;
-    }
-
-    public void setIs_announced(boolean is_announced) {
-        this.is_announced = is_announced;
-    }
-
-    public boolean isIs_downloadable() {
-        return is_downloadable;
-    }
-
-    public void setIs_downloadable(boolean is_downloadable) {
-        this.is_downloadable = is_downloadable;
     }
 
     public double getScore() {
