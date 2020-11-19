@@ -16,7 +16,7 @@ public interface GameService {
 
     Game save(Game game);
 
-    boolean existedName(String name);
+    boolean existedName(String name, long id);
 
 //    GameDiscount setDiscount(GameDiscount gameDiscount, long gameId);
 
@@ -28,6 +28,7 @@ public interface GameService {
 
     void download(HttpServletResponse response, String fileName, String type) throws IOException;
 
+    List<Game> search(String tag, String name);
 
 //    public Object findById(long id);
 }

@@ -2,7 +2,7 @@ package com.sustech.gamercenter.controller;
 
 import com.sustech.gamercenter.config.MyException;
 import com.sustech.gamercenter.model.Game;
-import com.sustech.gamercenter.model.GameDiscount;
+//import com.sustech.gamercenter.model.GameDiscount;
 import com.sustech.gamercenter.service.GameService;
 import com.sustech.gamercenter.service.ResultService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class GameController {
 
     @PostMapping("/create")
     public Object createGame(Game game) {
-        if (gameService.existedName(game.getName())) {
+        if (gameService.existedName(game.getName(), -1)) {
             throw new MyException(1, "游戏名已存在");
         }
         return ResultService.success(gameService.save(game));
@@ -52,7 +52,7 @@ public class GameController {
 
     @PostMapping("/update")
     public Object updateGame(Game game) {
-        if (gameService.existedName(game.getName())) {
+        if (gameService.existedName(game.getName(), game.getId())) {
             throw new MyException(1, "游戏名已存在");
         }
         return ResultService.success(gameService.save(game));
@@ -71,11 +71,17 @@ public class GameController {
         return ResultService.success("");
     }
 
-    @RequestMapping("/purchase")
+    @GetMapping("/purchase")
     public Object purchase(@RequestParam("user_id") long userId, @RequestParam("game_id") long gameId) {
         gameService.purchase(userId, gameId);
         return ResultService.success("");
     }
+
+    @GetMapping("/list")
+    public Object search(@RequestParam("tag") String tag, @RequestParam("name") String name){
+        return ResultService.success(gameService.search(tag, name));
+    }
+
 //    @PostMapping("/discount")
 //    public Object setDiscount(GameDiscount gameDiscount, long id){
 //        return gameService.setDiscount(gameDiscount, id);

@@ -79,8 +79,9 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public boolean existedName(String name) {
-        return gameRepository.findByName(name) != null;
+    public boolean existedName(String name, long id) {
+        Game game = gameRepository.findByName(name);
+        return game != null && game.getId() != id;
     }
 //
 //    @Override
@@ -125,5 +126,14 @@ public class GameServiceImpl implements GameService {
     public List<GameContent> findAllByGameId(long gameId) {
         return gameContentRepository.findAllByGameId(gameId);
     }
+
+    @Override
+    public List<Game> search(String tag, String name){
+        if(tag.equals("") && name.equals("")) return gameRepository.findAll();
+        else if(tag.equals("")) return gameRepository.findAllByNameLike(name);
+        else if(name.equals("")) return gameRepository.findAllByTag(tag);
+        else return gameRepository.findByTagOrNameLike(tag, name);
+    }
+
 
 }
