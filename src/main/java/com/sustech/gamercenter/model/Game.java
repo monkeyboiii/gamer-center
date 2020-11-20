@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Game {
@@ -31,6 +32,27 @@ public class Game {
     private String release_date;
 
     private double discount_rate;
+
+    private String front_image;
+
+    public String getFrontImage() {
+        return front_image;
+    }
+
+    public void setFrontImage(String front_image) {
+        this.front_image = front_image;
+    }
+
+    @OneToMany(cascade = {CascadeType.ALL})
+    private List<GameContent> gameContents;
+
+    public List<GameContent> getGameContents() {
+        return gameContents;
+    }
+
+    public void setGameContents(List<GameContent> gameContents) {
+        this.gameContents = gameContents;
+    }
 
     public String getBranch() {
         return branch;

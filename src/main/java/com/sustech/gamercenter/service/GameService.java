@@ -28,7 +28,7 @@ public interface GameService {
 
     void download(HttpServletResponse response, String fileName, String type) throws IOException;
 
-    List<Game> search(String tag, String name);
+    List<Game> search(String tag, String name, int page);
 
 //    public Object findById(long id);
 }

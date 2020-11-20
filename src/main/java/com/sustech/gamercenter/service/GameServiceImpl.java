@@ -8,6 +8,8 @@ import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.model.GameContent;
 //import com.sustech.gamercenter.model.GameDiscount;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,6 +63,11 @@ public class GameServiceImpl implements GameService {
         g.setType(type);
         g.setGameId(id);
         gameContentRepository.save(g);
+        if(type.equals("image")){
+            Game game = gameRepository.findById(id);
+            game.setFrontImage(filename);
+            gameRepository.save(game);
+        }
     }
 
     @Override
@@ -128,11 +135,17 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<Game> search(String tag, String name){
-        if(tag.equals("") && name.equals("")) return gameRepository.findAll();
-        else if(tag.equals("")) return gameRepository.findAllByNameLike(name);
-        else if(name.equals("")) return gameRepository.findAllByTag(tag);
-        else return gameRepository.findByTagOrNameLike(tag, name);
+    public List<Game> search(String tag, String name, int page){
+        Pageable pageable = PageRequest.of(page,10);
+
+//        List<Game> games = gameRepository.findAllByNameLike(name,pageable);
+        List<Game> games;
+        if(tag.equals("") && name.equals("")) games= gameRepository.findAllGame(pageable);
+        else if(tag.equals("")) games= gameRepository.findAllByNameLike(name,pageable);
+        else if(name.equals("")) games= gameRepository.findAllByTag(tag,pageable);
+        else games= gameRepository.findByTagOrNameLike(tag, name,pageable);
+        return games;
+
     }
 
 

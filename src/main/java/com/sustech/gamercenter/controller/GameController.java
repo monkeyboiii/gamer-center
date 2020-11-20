@@ -3,6 +3,7 @@ package com.sustech.gamercenter.controller;
 import com.sustech.gamercenter.config.MyException;
 import com.sustech.gamercenter.model.Game;
 //import com.sustech.gamercenter.model.GameDiscount;
+import com.sustech.gamercenter.model.GameContent;
 import com.sustech.gamercenter.service.GameService;
 import com.sustech.gamercenter.service.ResultService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,8 +80,9 @@ public class GameController {
     }
 
     @GetMapping("/list")
-    public Object search(@RequestParam("tag") String tag, @RequestParam("name") String name){
-        return ResultService.success(gameService.search(tag, name));
+    public Object search(@RequestParam("tag") String tag, @RequestParam("name") String name, @RequestParam("page") int page){
+        return gameService.search(tag, name,page);
+//        return ResultService.success(gameService.search(tag, name));
     }
 
 //    @PostMapping("/discount")
