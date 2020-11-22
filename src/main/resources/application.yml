@@ -14,9 +14,9 @@ spring:
         max-wait: -1
         max-idle: 8
         min-idle: 0
-#
-#  profiles:
-#    active: dev
+
+  profiles:
+    active: dev
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

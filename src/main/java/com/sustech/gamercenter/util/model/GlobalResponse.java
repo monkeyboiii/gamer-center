@@ -1,4 +1,4 @@
-package com.sustech.gamercenter.config;
+package com.sustech.gamercenter.util.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

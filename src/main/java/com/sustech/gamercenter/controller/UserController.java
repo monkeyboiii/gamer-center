@@ -3,8 +3,11 @@ package com.sustech.gamercenter.controller;
 
 import com.sustech.gamercenter.security.AuthToken;
 import com.sustech.gamercenter.security.AuthorizationInterceptor;
+import com.sustech.gamercenter.service.PlayerService;
 import com.sustech.gamercenter.service.UserService;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
+import com.sustech.gamercenter.util.exception.InvalidTokenException;
+import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import com.sustech.gamercenter.util.model.JsonResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,16 +31,18 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    UserService userService; // dummy
+    UserService userService;
+
+    @Autowired
+    PlayerService playerService;
 
     @Autowired
     SimpleTokenService tokenService;
 
     @AuthToken
     @GetMapping("/info")
-    public JsonResponse getFullUserInfo(@RequestHeader("token") String token) {
-        logger.info("token received: " + token);
-        return new JsonResponse(0, "Success");
+    public JsonResponse getPlayerInfo(@RequestHeader("token") String token) throws InvalidTokenException {
+        return new JsonResponse(0, "Success", playerService.getPlayerInfo(token));
     }
 
 
@@ -64,9 +69,8 @@ public class UserController {
     @GetMapping("/account/topup")
     public JsonResponse topUpAccount(@RequestHeader("token") String token,
                                      @RequestParam("amount") Double amount
-    ) {
-        logger.info("token received: " + token);
-        logger.info("amount received: " + amount);
+    ) throws UserNotFoundException, InvalidTokenException {
+        userService.topup(token, amount);
         return new JsonResponse(0, "Successfully topped up");
     }
 

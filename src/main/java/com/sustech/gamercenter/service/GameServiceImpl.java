@@ -1,6 +1,6 @@
 package com.sustech.gamercenter.service;
 
-import com.sustech.gamercenter.config.MyException;
+import com.sustech.gamercenter.util.exception.MyException;
 import com.sustech.gamercenter.dao.GameContentRepository;
 //import com.sustech.gamercenter.dao.GameDiscountRepository;
 import com.sustech.gamercenter.dao.GameRepository;

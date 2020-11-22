@@ -3,9 +3,11 @@ package com.sustech.gamercenter.service;
 
 import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.model.GameContent;
-import com.sustech.gamercenter.model.User;
+import com.sustech.gamercenter.dao.PlayerRepository;
 import com.sustech.gamercenter.dao.UserRepository;
-import com.sustech.gamercenter.service.token.SimpleTokenServiceImpl;
+import com.sustech.gamercenter.model.Player;
+import com.sustech.gamercenter.model.User;
+import com.sustech.gamercenter.service.token.SimpleTokenService;
 import com.sustech.gamercenter.util.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,13 +23,16 @@ import java.io.IOException;
 public class UserService {
 
     @Autowired
-    private PasswordEncoder encoder;
+    PasswordEncoder encoder;
 
     @Autowired
-    private UserRepository userRepository;
+    UserRepository userRepository;
 
     @Autowired
-    SimpleTokenServiceImpl tokenService;
+    PlayerRepository playerRepository;
+
+    @Autowired
+    SimpleTokenService tokenService;
 
 
     private final static String STORAGE_PREFIX = System.getProperty("user.dir");
@@ -59,11 +64,11 @@ public class UserService {
                         new UserNotFoundException("User with email " + email + " doesn't exist"));
     }
 
-
-    /**
-     * TODO, authority check
-     */
     public User registerUser(String name, String email, String password, String role) throws UserRegisterException, UnauthorizedAttemptException {
+        if (role.contains("a") || role.contains("t")) {
+            throw new UnauthorizedAttemptException("Cannot register admin/tester account");
+        }
+
         try {
             password = encoder.encode(password);
             User user = new User(name, email, password, role);
@@ -81,12 +86,12 @@ public class UserService {
     //
     // login/token required
 
-    // TODO
 
     public void changePassword(String token, String old, String password) throws IncorrectPasswordException, InvalidTokenException, UserNotFoundException {
         User user = queryUserById((tokenService.getIdByToken(token)));
         if (encoder.matches(old, user.getPassword())) {
-            userRepository.updatePassword(user.getId(), encoder.encode(password));
+            user.setPassword(encoder.encode(password));
+            userRepository.flush();
         } else {
             throw new IncorrectPasswordException("Old password incorrect");
         }
@@ -100,12 +105,13 @@ public class UserService {
 
     public void changeEmailConfirm(String token, String email, String confirmation_code) throws InvalidTokenException, UserNotFoundException {
         User user = queryUserById((tokenService.getIdByToken(token)));
+        // TODO add email confirmation
     }
 
     public void changeBio(String token, String bio) throws InvalidTokenException, UserNotFoundException {
-        Long id = tokenService.getIdByToken(token);
         User user = queryUserById((tokenService.getIdByToken(token)));
-        userRepository.updateBio(id, bio);
+        user.setBio(bio);
+        userRepository.flush();
     }
 
     public void uploadAvatar(String token, MultipartFile avatar) throws InvalidTokenException, UserNotFoundException, IOException {
@@ -118,6 +124,12 @@ public class UserService {
         String filename = user.getId().toString() + ".jpg";
         File fileServer = new File(dir, filename);
         avatar.transferTo(fileServer);
+    }
+
+    public void topup(String token, Double amount) throws InvalidTokenException, UserNotFoundException {
+        User user = queryUserById((tokenService.getIdByToken(token)));
+        user.setBalance(user.getBalance() + amount);
+        userRepository.flush();
     }
 
     public void transfer(Double amount, Long from, Long to) throws UserNotFoundException, InsufficientBalanceException {
@@ -143,4 +155,5 @@ public class UserService {
         inputStream.read(bytes, 0, inputStream.available());
         return bytes;
     }
+
 }

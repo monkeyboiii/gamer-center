@@ -43,8 +43,10 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         if (method.getAnnotation(AuthToken.class) != null || handlerMethod.getBeanType().getAnnotation(AuthToken.class) != null) {
             String token = request.getHeader(httpHeaderName);
             logger.info("Get token from request is {} ", token);
-
             tokenService.checkToken(token); // pass or throws
+
+//            AuthToken authToken = method.getAnnotation(AuthToken.class);
+
         }
 
         request.setAttribute(REQUEST_CURRENT_KEY, null);
@@ -52,13 +54,16 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         return true;
     }
 
+
+    //
+    //
+    //
+
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        // TODO
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        // TODO
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
     }
 }

@@ -1,37 +1,57 @@
 package com.sustech.gamercenter.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import java.sql.Timestamp;
+import javax.persistence.*;
 import java.util.List;
 
+@Entity
+public class Player {
 
-public class Player extends User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @OneToMany(cascade = {CascadeType.ALL})
+    List<Game> games;
 
 
-    List<String> games;
+    @OneToMany(cascade = {CascadeType.ALL})
+    List<User> friends;
 
-    List<String> friends;
+
+    public Player(Long id, List<Game> games, List<User> friends) {
+        this.id = id;
+        this.games = games;
+        this.friends = friends;
+    }
+
+    public Player(Long id) {
+        this.id = id;
+    }
 
     public Player() {
     }
 
+    public Long getId() {
+        return id;
+    }
 
-    public List<String> getGames() {
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public List<Game> getGames() {
         return games;
     }
 
-    public void setGames(List<String> games) {
+    public void setGames(List<Game> games) {
         this.games = games;
     }
 
-    public List<String> getFriends() {
+    public List<User> getFriends() {
         return friends;
     }
 
-    public void setFriends(List<String> friends) {
+    public void setFriends(List<User> friends) {
         this.friends = friends;
     }
 }

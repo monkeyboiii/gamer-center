@@ -1,5 +1,7 @@
 package com.sustech.gamercenter.util.config;
 
+import com.sustech.gamercenter.util.model.GlobalResponse;
+import com.sustech.gamercenter.util.exception.MyException;
 import com.sustech.gamercenter.util.model.JsonResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,22 @@ public class ExceptionHandlerConfig {
                 .code(-1)
                 .msg(e.getClass().getSimpleName())
                 .data(customMessage)
+                .build();
+    }
+
+
+    //
+    //
+    // zeng ming
+
+
+    @ExceptionHandler(value = MyException.class)
+    @ResponseBody
+    public GlobalResponse<String> exceptionHandler(MyException e) {
+        System.out.println("未知异常！原因是:" + e);
+        return GlobalResponse.<String>builder()
+                .code(e.getCode())
+                .msg(e.getMessage())
                 .build();
     }
 }

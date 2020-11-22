@@ -6,7 +6,7 @@ target/
 
 
 /src/main/resources/*-*.yml
-
+/src/main/resources/static/
 
 ### STS ###
 .apt_generated

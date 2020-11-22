@@ -9,4 +9,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AuthToken {
 
+    String requiredRole() default "";
+
+    String requiredPermission() default "";
+
+    // TODO add role/permission based authorization
 }

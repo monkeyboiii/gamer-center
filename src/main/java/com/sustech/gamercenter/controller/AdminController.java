@@ -3,6 +3,7 @@ package com.sustech.gamercenter.controller;
 import com.sustech.gamercenter.security.AuthToken;
 import com.sustech.gamercenter.service.AdminService;
 import com.sustech.gamercenter.util.exception.UnauthorizedAttemptException;
+import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import com.sustech.gamercenter.util.exception.UserRegisterException;
 import com.sustech.gamercenter.util.model.JsonResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +14,10 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
 
     @Autowired
-    AdminService adminService; // dummy
+    AdminService adminService;
 
 
-    @AuthToken
+    @AuthToken(requiredRole = "a")
     @PostMapping("/user/create")
     public JsonResponse createUser(@RequestHeader("token") String token,
                                    @RequestParam("user_name") String name,
@@ -43,7 +44,7 @@ public class AdminController {
     @AuthToken
     @GetMapping("/user/info")
     public JsonResponse getUserInfo(@RequestHeader("token") String token,
-                                    @RequestParam(value = "user_id", required = false) Integer user_id,
+                                    @RequestParam(value = "user_id", required = false) Long user_id,
                                     @RequestParam(value = "user_name", required = false) String name,
                                     @RequestParam(value = "user_email", required = false) String email
     ) {
@@ -54,13 +55,13 @@ public class AdminController {
 
     @AuthToken
     @GetMapping("/user/account/lock")
-    public JsonResponse lockOrUnlcokAccount(@RequestHeader("token") String token,
-                                            @RequestParam(value = "user_id", required = false) Integer user_id,
+    public JsonResponse lockOrUnlockAccount(@RequestHeader("token") String token,
+                                            @RequestParam(value = "user_id", required = false) Long user_id,
                                             @RequestParam(value = "user_name", required = false) String name,
                                             @RequestParam(value = "user_email", required = false) String email,
                                             @RequestParam("lock") Boolean lock
-    ) {
-
+    ) throws UserNotFoundException {
+        adminService.lockOrUnlockAccount(user_id, lock);
         return new JsonResponse(0, "Successfully " + (lock ? "locked" : "unlocked"));
     }
 
@@ -68,10 +69,10 @@ public class AdminController {
     @AuthToken
     @PostMapping("/user/assign")
     public JsonResponse assignUserRoleById(@RequestHeader("token") String token,
-                                           @RequestParam("user_id") Integer user_id,
+                                           @RequestParam("user_id") Long user_id,
                                            @RequestParam("role") String role
-    ) {
-
+    ) throws UserNotFoundException {
+        adminService.assignRole(user_id, role);
         return new JsonResponse(0, "Successfully assigned");
     }
 

@@ -1,6 +1,6 @@
 package com.sustech.gamercenter.controller;
 
-import com.sustech.gamercenter.config.MyException;
+import com.sustech.gamercenter.util.exception.MyException;
 import com.sustech.gamercenter.model.GameComment;
 import com.sustech.gamercenter.service.GameCommentService;
 import com.sustech.gamercenter.service.ResultService;
