@@ -1,6 +1,8 @@
 package com.sustech.gamercenter.service;
 
 
+import com.sustech.gamercenter.model.Game;
+import com.sustech.gamercenter.model.GameContent;
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.service.token.SimpleTokenServiceImpl;
@@ -8,8 +10,12 @@ import com.sustech.gamercenter.util.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 @Service
 public class UserService {
@@ -24,6 +30,7 @@ public class UserService {
     SimpleTokenServiceImpl tokenService;
 
 
+    private final static String STORAGE_PREFIX = System.getProperty("user.dir");
     /**
      * normal try catch with throwable stacktrace option available
      */
@@ -101,8 +108,16 @@ public class UserService {
         userRepository.updateBio(id, bio);
     }
 
-    public void uploadAvatar(String token, File file) throws InvalidTokenException, UserNotFoundException {
+    public void uploadAvatar(String token, MultipartFile avatar) throws InvalidTokenException, UserNotFoundException, IOException {
         User user = queryUserById((tokenService.getIdByToken(token)));
+
+        String path = File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
+                + "static" + File.separator + "user" + File.separator + "avatar";
+        String realPath = STORAGE_PREFIX + path;
+        File dir = new File(realPath);
+        String filename = user.getId().toString() + ".jpg";
+        File fileServer = new File(dir, filename);
+        avatar.transferTo(fileServer);
     }
 
     public void transfer(Double amount, Long from, Long to) throws UserNotFoundException, InsufficientBalanceException {
@@ -117,5 +132,15 @@ public class UserService {
         payee.setBalance(payee.getBalance() + amount);
 
         userRepository.flush();
+    }
+
+    public byte[] getAvatar(String id) throws IOException {
+        String path = STORAGE_PREFIX + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
+                + "static" + File.separator + "user" + File.separator + "avatar" + File.separator + id + ".jpg";
+        File file = new File(path);
+        FileInputStream inputStream = new FileInputStream(file);
+        byte[] bytes = new byte[inputStream.available()];
+        inputStream.read(bytes, 0, inputStream.available());
+        return bytes;
     }
 }

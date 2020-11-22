@@ -9,7 +9,10 @@ import com.sustech.gamercenter.util.model.JsonResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 
 /**
@@ -68,4 +71,9 @@ public class UserController {
     }
 
 
+    @RequestMapping(value = "/avatar/{id:[0-9]+}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @ResponseBody
+    public byte[] getAvatar(@PathVariable("id") String id) throws IOException {
+        return userService.getAvatar(id);
+    }
 }
