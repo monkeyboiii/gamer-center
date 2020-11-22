@@ -1,3 +1,4 @@
+
 package com.sustech.gamercenter;
 
 import org.junit.jupiter.api.Test;

@@ -2,6 +2,22 @@ server:
   port: 8080
 
 spring:
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    password:
+    timeout: 3000
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 8
+        min-idle: 0
+#
+#  profiles:
+#    active: dev
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://47.115.76.10:3306/ooad_project?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT
@@ -12,6 +28,11 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      fail-on-empty-beans: false
 
   # Hot reload in dev
   devtools:

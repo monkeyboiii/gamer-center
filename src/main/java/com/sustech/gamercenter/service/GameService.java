@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface GameService {
-    void purchase(long userId, long gameId);
+//    void purchase(long userId, long gameId);
 
     void uploadFile(String type, MultipartFile uploadFile, long id) throws IOException;
 

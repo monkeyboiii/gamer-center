@@ -73,11 +73,11 @@ public class GameController {
         return ResultService.success("");
     }
 
-    @GetMapping("/purchase")
-    public Object purchase(@RequestParam("user_id") long userId, @RequestParam("game_id") long gameId) {
-        gameService.purchase(userId, gameId);
-        return ResultService.success("");
-    }
+//    @GetMapping("/purchase")
+//    public Object purchase(@RequestParam("user_id") long userId, @RequestParam("game_id") long gameId) {
+//        gameService.purchase(userId, gameId);
+//        return ResultService.success("");
+//    }
 
     @GetMapping("/list")
     public Object search(@RequestParam("tag") String tag, @RequestParam("name") String name, @RequestParam("page") int page){

@@ -34,17 +34,17 @@ public class GameServiceImpl implements GameService {
 
     private final static String STORAGE_PREFIX = System.getProperty("user.dir");
 
-    @Override
-    public void purchase(long userId, long gameId) {
-        Game game = gameRepository.findById(gameId);
-        double price = game.getPrice();
-        SimpleDateFormat tempDate = new SimpleDateFormat("yyyy-mm-dd");
-        String datetime = tempDate.format(new java.util.Date());
-        if (datetime.compareTo(game.getDiscountStart()) >= 0 && datetime.compareTo(game.getDiscountEnd()) <= 0) {
-            price = price * game.getDiscountRate();
-        }
-        userService.pay(price, userId, game.getDeveloperId());
-    }
+//    @Override
+//    public void purchase(long userId, long gameId) {
+//        Game game = gameRepository.findById(gameId);
+//        double price = game.getPrice();
+//        SimpleDateFormat tempDate = new SimpleDateFormat("yyyy-mm-dd");
+//        String datetime = tempDate.format(new java.util.Date());
+//        if (datetime.compareTo(game.getDiscountStart()) >= 0 && datetime.compareTo(game.getDiscountEnd()) <= 0) {
+//            price = price * game.getDiscountRate();
+//        }
+//        userService.pay(price, userId, game.getDeveloperId());
+//    }
 
 
     @Override
