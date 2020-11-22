@@ -33,18 +33,18 @@ public class GameCommentController {
     }
 
     @DeleteMapping(path = "{id}")
-    public Object deleteComment(@PathVariable("id") int commentId){
+    public Object deleteComment(@PathVariable("id") long commentId){
         gameCommentService.deleteComment(commentId);
         return ResultService.success("");
     }
 
     @GetMapping(path = "GID/{id}")
-    public Object getCommentByGame(@PathVariable("id") int GID){
+    public Object getCommentByGame(@PathVariable("id") long GID){
         return ResultService.success(gameCommentService.getCommentByGame(GID));
     }
 
     @GetMapping(path = "UID/{id}")
-    public Object getCommentByUser(@PathVariable("id") int UID){
+    public Object getCommentByUser(@PathVariable("id") long UID){
         return ResultService.success(gameCommentService.getCommentByUser(UID));
     }
 }

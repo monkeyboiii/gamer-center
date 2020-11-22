@@ -7,11 +7,11 @@ import java.util.List;
 public interface GameCommentService {
     int addComment(GameComment gameComment);
 
-    List<GameComment> getCommentByGame(int GID);
+    List<GameComment> getCommentByGame(long GID);
 
-    List<GameComment> getCommentByUser(int UID);
+    List<GameComment> getCommentByUser(long UID);
 
     List<GameComment> getAllComment();
 
-    int deleteComment(int commentId);
+    int deleteComment(long commentId);
 }
