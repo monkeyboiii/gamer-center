@@ -6,6 +6,8 @@ import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.model.GameContent;
 import com.sustech.gamercenter.service.GameService;
 import com.sustech.gamercenter.service.ResultService;
+import com.sustech.gamercenter.util.exception.InsufficientBalanceException;
+import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.MediaType;
@@ -73,11 +75,11 @@ public class GameController {
         return ResultService.success("");
     }
 
-//    @GetMapping("/purchase")
-//    public Object purchase(@RequestParam("user_id") long userId, @RequestParam("game_id") long gameId) {
-//        gameService.purchase(userId, gameId);
-//        return ResultService.success("");
-//    }
+    @GetMapping("/purchase")
+    public Object purchase(@RequestParam("user_id") long userId, @RequestParam("game_id") long gameId) throws InsufficientBalanceException, UserNotFoundException {
+        gameService.purchase(userId, gameId);
+        return ResultService.success("");
+    }
 
     @GetMapping("/list")
     public Object search(@RequestParam("tag") String tag, @RequestParam("name") String name, @RequestParam("page") int page){

@@ -102,4 +102,18 @@ public class UserService {
     public void uploadAvatar(String token, File file) throws InvalidTokenException, UserNotFoundException {
         User user = queryUserById((tokenService.getIdByToken(token)));
     }
+
+    public void transfer(Double amount, Long from, Long to) throws UserNotFoundException, InsufficientBalanceException {
+        User payer = queryUserById(from);
+        User payee = queryUserById(to);
+        Double balance = payer.getBalance();
+        if (balance < amount) {
+            throw new InsufficientBalanceException("User  " + payer.getName() + " has no sufficient balance");
+        }
+
+        payer.setBalance(balance - amount);
+        payee.setBalance(payee.getBalance() + amount);
+
+        userRepository.flush();
+    }
 }

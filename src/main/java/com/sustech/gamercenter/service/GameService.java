@@ -3,6 +3,8 @@ package com.sustech.gamercenter.service;
 import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.model.GameContent;
 //import com.sustech.gamercenter.model.GameDiscount;
+import com.sustech.gamercenter.util.exception.InsufficientBalanceException;
+import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -10,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface GameService {
-//    void purchase(long userId, long gameId);
+    void purchase(long userId, long gameId) throws UserNotFoundException, InsufficientBalanceException;
 
     void uploadFile(String type, MultipartFile uploadFile, long id) throws IOException;
 
