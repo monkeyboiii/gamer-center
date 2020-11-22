@@ -16,6 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
+    /*
     @Transactional
     @Modifying
     @Query(value = "update users set bio = :bio  where id = :id", nativeQuery = true)
@@ -30,5 +31,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query(value = "update users set password = :password  where id = :id", nativeQuery = true)
     int updatePassword(@Param("id") Long id, @Param("password") String password);
+    */
+
 
 }

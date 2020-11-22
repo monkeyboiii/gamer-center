@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 80
 
 spring:
   profiles:
@@ -14,3 +14,6 @@ spring:
     default-property-inclusion: non_null
     serialization:
       fail-on-empty-beans: false
+    parser:
+      allow_unquoted_control_chars: true
+      allow_single_quotes: true

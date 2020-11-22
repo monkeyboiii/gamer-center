@@ -33,7 +33,6 @@ public class LoginService {
     public String loginAuthentication(String email, String password) throws UserNotFoundException, IncorrectPasswordException {
         User user = userService.queryUserByEmail(email);
         if (encoder.matches(password, user.getPassword())) {
-            // TODO add more authentication
             return tokenService.createToken(user);
         } else {
             throw new IncorrectPasswordException("Password incorrect");
@@ -42,7 +41,6 @@ public class LoginService {
 
 
     public void logout(String token) throws UserHasNoTokenException, InvalidTokenException {
-        logger.warn("pretend that this token " + token + " is destroyed or something");
         tokenService.deleteToken(token);
     }
 

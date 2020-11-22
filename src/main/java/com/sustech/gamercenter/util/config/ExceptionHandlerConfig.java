@@ -20,15 +20,14 @@ public class ExceptionHandlerConfig {
     @ExceptionHandler(value = Exception.class)
     public JsonResponse globalExceptionHandler(Exception e) {
         String customMessage = e.getMessage() == null ? msg : e.getMessage();
-
-        logger.error("caught in GlobalExceptionHandler ".toUpperCase() + e.getClass().getName() + customMessage);
-
         Arrays.stream(e.getStackTrace())
                 .filter(x -> x.toString().startsWith("com.sustech.gamercenter"))
                 .forEach(x -> logger.warn(x.toString()));
 
         // debug
+        logger.error("caught in GlobalExceptionHandler ".toUpperCase() + e.getClass().getName() + customMessage);
         e.printStackTrace();
+        logger.info("debug info ends here");
 
         return new JsonResponse.builder()
                 .code(-1)

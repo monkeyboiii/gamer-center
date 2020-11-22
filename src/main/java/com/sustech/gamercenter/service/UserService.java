@@ -79,7 +79,8 @@ public class UserService {
     public void changePassword(String token, String old, String password) throws IncorrectPasswordException, InvalidTokenException, UserNotFoundException {
         User user = queryUserById((tokenService.getIdByToken(token)));
         if (encoder.matches(old, user.getPassword())) {
-            userRepository.updatePassword(user.getId(), encoder.encode(password));
+            user.setPassword(encoder.encode(password));
+            userRepository.flush();
         } else {
             throw new IncorrectPasswordException("Old password incorrect");
         }
@@ -91,15 +92,39 @@ public class UserService {
 
     public void changeEmailConfirm(String token, String email, String confirmation_code) throws InvalidTokenException, UserNotFoundException {
         User user = queryUserById((tokenService.getIdByToken(token)));
+        if (confirmation_code == "valid") {
+
+        }
     }
 
     public void changeBio(String token, String bio) throws InvalidTokenException, UserNotFoundException {
-        Long id = tokenService.getIdByToken(token);
         User user = queryUserById((tokenService.getIdByToken(token)));
-        userRepository.updateBio(id, bio);
+        user.setBio(bio);
+        userRepository.flush();
     }
 
     public void uploadAvatar(String token, File file) throws InvalidTokenException, UserNotFoundException {
         User user = queryUserById((tokenService.getIdByToken(token)));
+    }
+
+    public void topup(String token, Double amount) throws InvalidTokenException, UserNotFoundException {
+        Long id = tokenService.getIdByToken(token);
+        User user = queryUserById((tokenService.getIdByToken(token)));
+        user.setBalance(user.getBalance() + amount);
+        userRepository.flush();
+    }
+
+    public void transfer(Double amount, Long from, Long to) throws UserNotFoundException, InsufficientBalanceException {
+        User payer = queryUserById(from);
+        User payee = queryUserById(to);
+        Double balance = payer.getBalance();
+        if (balance < amount) {
+            throw new InsufficientBalanceException("User  " + payer.getName() + " has no sufficient balance");
+        }
+
+        payer.setBalance(balance - amount);
+        payee.setBalance(payee.getBalance() + amount);
+
+        userRepository.flush();
     }
 }

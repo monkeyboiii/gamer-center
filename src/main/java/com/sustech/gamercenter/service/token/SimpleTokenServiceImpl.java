@@ -94,8 +94,8 @@ public class SimpleTokenServiceImpl implements SimpleTokenService {
     @Override
     public void deleteToken(String token) throws InvalidTokenException, UserHasNoTokenException {
         Long id = getIdByToken(token);
-        deleteToken(id);
         redisTemplate.delete(token);
+        redisTemplate.delete(id.toString());
     }
 
     @Override
