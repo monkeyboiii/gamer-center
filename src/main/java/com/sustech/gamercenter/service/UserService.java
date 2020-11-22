@@ -87,6 +87,8 @@ public class UserService {
 
     public void changeEmail(String token, String email) throws InvalidTokenException, UserNotFoundException {
         User user = queryUserById((tokenService.getIdByToken(token)));
+        user.setEmail(email);
+        userRepository.flush();
     }
 
     public void changeEmailConfirm(String token, String email, String confirmation_code) throws InvalidTokenException, UserNotFoundException {

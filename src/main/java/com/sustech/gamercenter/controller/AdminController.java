@@ -24,7 +24,6 @@ public class AdminController {
                                    @RequestParam("password") String password,
                                    @RequestParam("role") String role
     ) throws UserRegisterException, UnauthorizedAttemptException {
-
         return new JsonResponse(0, "Successfully created", adminService.createUser(name, email, password, role));
     }
 
