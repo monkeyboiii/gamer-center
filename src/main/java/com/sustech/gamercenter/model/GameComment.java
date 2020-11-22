@@ -11,10 +11,10 @@ import javax.persistence.Id;
 public class GameComment {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long game_comment_id;
+    private long game_comment_id;
 
-    private int user_id;
-    private int game_id;
+    private long user_id;
+    private long game_id;
     private String content;
     private double grade;
 
@@ -26,7 +26,7 @@ public class GameComment {
         this.game_comment_id = game_comment_id;
     }
 
-    public int getUser_id() {
+    public long getUser_id() {
         return user_id;
     }
 
@@ -34,7 +34,7 @@ public class GameComment {
         this.user_id = user_id;
     }
 
-    public int getGame_id() {
+    public long getGame_id() {
         return game_id;
     }
 

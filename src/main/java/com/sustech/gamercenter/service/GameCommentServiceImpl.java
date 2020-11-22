@@ -14,8 +14,8 @@ public class GameCommentServiceImpl implements GameCommentService {
 
     @Override
     public int addComment(GameComment gameComment) {
-        int UID = gameComment.getUser_id();
-        int GID = gameComment.getGame_id();
+        long UID = gameComment.getUser_id();
+        long GID = gameComment.getGame_id();
         String content = gameComment.getContent();
         double grade = gameComment.getGrade();
         List<GameComment> U = getCommentByUser(UID);
@@ -28,12 +28,12 @@ public class GameCommentServiceImpl implements GameCommentService {
     }
 
     @Override
-    public List<GameComment> getCommentByGame(int GID) {
+    public List<GameComment> getCommentByGame(long GID) {
         return gameCommentRepository.getCommentByGame(GID);
     }
 
     @Override
-    public List<GameComment> getCommentByUser(int UID) {
+    public List<GameComment> getCommentByUser(long UID) {
         return gameCommentRepository.getCommentByUser(UID);
     }
 
@@ -43,7 +43,7 @@ public class GameCommentServiceImpl implements GameCommentService {
     }
 
     @Override
-    public int deleteComment(int commentId) {
+    public int deleteComment(long commentId) {
         return gameCommentRepository.deleteComment(commentId);
     }
 }
