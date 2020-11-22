@@ -1,65 +1,71 @@
 package com.sustech.gamercenter.controller;
 
-import com.sustech.gamercenter.model.JsonResponse;
-import com.sustech.gamercenter.model.User;
+
+import com.sustech.gamercenter.security.AuthToken;
+import com.sustech.gamercenter.security.AuthorizationInterceptor;
 import com.sustech.gamercenter.service.UserService;
+import com.sustech.gamercenter.service.token.SimpleTokenService;
+import com.sustech.gamercenter.util.model.JsonResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
 
-
+/**
+ * login/token required
+ * <p>
+ * intercepted by {@link AuthorizationInterceptor}
+ * and processed with role role based authorization model
+ **/
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
 
-    private static Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
     @Autowired
-    private UserService userService;
+    UserService userService; // dummy
 
+    @Autowired
+    SimpleTokenService tokenService;
 
-    @GetMapping
-    public JsonResponse getUserInfo(@RequestParam("user_id") Long user_id,
-                                    @RequestParam("user_name") String name,
-                                    @RequestParam("user_email") String email
-    ) {
-        User user1 = userService.queryUserById(user_id);
-        User user2 = userService.queryUserByName(name);
-        User user3 = userService.queryUserByEmail(email);
-
-        List<User> list = new ArrayList<>();
-        list.add(user1);
-        list.add(user2);
-        list.add(user3);
-        return new JsonResponse(0, "Success", list);
-    }
-
-
+    @AuthToken
     @GetMapping("/info")
-    public JsonResponse getFullUserInfo(@RequestParam("token") String token) {
+    public JsonResponse getFullUserInfo(@RequestHeader("token") String token) {
+        logger.info("token received: " + token);
         return new JsonResponse(0, "Success");
     }
 
 
-    @PostMapping("/register")
-    public JsonResponse register(@RequestParam("name") String name,
-                                 @RequestParam("email") String email,
-                                 @RequestParam("password") String password,
-                                 @RequestParam("role") String role
+    @AuthToken
+    @GetMapping("/game")
+    public JsonResponse userHasGames(@RequestHeader("token") String token,
+                                     @RequestParam("tag") String tag
     ) {
-        logger.info(password);
-//        logger.info(String.valueOf(avatar.canRead()));
-        userService.registerUser(new User(name,email,password,role));
-        return new JsonResponse(0, "Successful registered");
+        logger.info("token received: " + token);
+        logger.info("tag received: " + tag);
+        return new JsonResponse(0, "Successfully retrieved");
     }
 
 
-    @PostMapping("/logout")
-    public JsonResponse logout(@RequestParam("token") String token) {
-        // TODO
-        return new JsonResponse(0, "Successfully logged out");
+    @AuthToken
+    @GetMapping("/collection")
+    public JsonResponse getCollection(@RequestHeader("token") String token) {
+        logger.info("token received: " + token);
+        return new JsonResponse(0, "Successfully retrieved");
     }
+
+
+    @AuthToken
+    @GetMapping("/account/topup")
+    public JsonResponse topUpAccount(@RequestHeader("token") String token,
+                                     @RequestParam("amount") Double amount
+    ) {
+        logger.info("token received: " + token);
+        logger.info("amount received: " + amount);
+        return new JsonResponse(0, "Successfully topped up");
+    }
+
+
 }

@@ -1,15 +1,20 @@
 package com.sustech.gamercenter.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
 @Table(name = "users")
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
-public class User {
+public class User implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
@@ -20,10 +25,9 @@ public class User {
     @Column(name = "email", unique = true, nullable = false)
     protected String email;
 
+    @JsonIgnore
     @Column(name = "password", nullable = false)
     protected String password;
-
-//    private String token; // access token
 
     @Column(name = "role", nullable = false)
     protected String role; // combinations
@@ -39,9 +43,9 @@ public class User {
 
 
     @Column
-    protected Boolean is_online;
+    protected Boolean is_online = false;
     @Column
-    protected Boolean is_locked;
+    protected Boolean is_locked = false;
 
     @Column
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -54,7 +58,7 @@ public class User {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-//                ", password='" + password + '\'' +
+                ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
                 ", is_online=" + is_online +
                 ", is_locked=" + is_locked +
@@ -67,7 +71,7 @@ public class User {
 
     // can be used at register
     public User(String name, String email, String password, String role) {
-        this(name, email, password, role, false, false, new Timestamp(System.currentTimeMillis()));
+        this(name, email, password, role, 0.0, false, false, new Timestamp(System.currentTimeMillis()));
     }
 
     // for test purposes
@@ -76,10 +80,11 @@ public class User {
         this.id = id;
     }
 
-    public User(String name, String email, String password, String role, Boolean is_online, Boolean is_locked, Timestamp created_at) {
+    public User(String name, String email, String password, String role, Double balance, Boolean is_online, Boolean is_locked, Timestamp created_at) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.balance = balance;
         this.role = role;
         this.is_online = is_online;
         this.is_locked = is_locked;

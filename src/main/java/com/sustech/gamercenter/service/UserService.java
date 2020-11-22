@@ -1,48 +1,105 @@
 package com.sustech.gamercenter.service;
 
 
-import com.sustech.gamercenter.dao.UserDao;
 import com.sustech.gamercenter.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.sustech.gamercenter.repository.UserRepository;
+import com.sustech.gamercenter.service.token.SimpleTokenServiceImpl;
+import com.sustech.gamercenter.util.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.io.File;
 
 @Service
 public class UserService {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    @Autowired
+    private PasswordEncoder encoder;
 
     @Autowired
-    private UserDao userDao;
+    private UserRepository userRepository;
 
-    public User queryUserById(Long id) {
+    @Autowired
+    SimpleTokenServiceImpl tokenService;
+
+
+    /**
+     * normal try catch with throwable stacktrace option available
+     */
+    public User queryUserById(Long id) throws UserNotFoundException {
         try {
-            User result = userDao.getOne(id);
-            log.info(result.toString());
-            return result;
+            return userRepository.getOne(id);
         } catch (Exception e) {
-            log.info(e.toString(), e);
-            return new User();
-
+            throw new UserNotFoundException("User with id " + id.toString() + " doesn't exist");
         }
     }
 
-    public User queryUserByName(String name) {
-        User result = userDao.findByNameIgnoreCase(name);
-        return result;
+    /**
+     * {@link java.util.Optional<User>} style return or throw exception
+     */
+    public User queryUserByName(String name) throws UserNotFoundException {
+        return userRepository
+                .findByNameIgnoreCase(name)
+                .orElseThrow(() ->
+                        new UserNotFoundException("User with name " + name + " doesn't exist"));
     }
 
-    public User queryUserByEmail(String email) {
-        User result = userDao.findByEmail(email);
-        return result;
-    }
-
-    public Integer registerUser(User user) {
-        User res = userDao.save(user);
-        log.info(res.toString());
-        return 1;
+    public User queryUserByEmail(String email) throws UserNotFoundException {
+        return userRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new UserNotFoundException("User with email " + email + " doesn't exist"));
     }
 
 
+    /**
+     * TODO, authority check
+     */
+    public User registerUser(String name, String email, String password, String role) throws UserRegisterException, UnauthorizedAttemptException {
+        try {
+            password = encoder.encode(password);
+            User user = new User(name, email, password, role);
+            userRepository.save(user);
+            return user;
+        } catch (Exception e) {
+            throw new UserRegisterException(e.getClass().getSimpleName(), e);
+        }
+    }
+
+
+    //
+    //
+    //
+    //
+    // login/token required
+
+    // TODO
+
+    public void changePassword(String token, String old, String password) throws IncorrectPasswordException, InvalidTokenException, UserNotFoundException {
+        User user = queryUserById((tokenService.getIdByToken(token)));
+        if (encoder.matches(old, user.getPassword())) {
+            userRepository.updatePassword(user.getId(), encoder.encode(password));
+        } else {
+            throw new IncorrectPasswordException("Old password incorrect");
+        }
+    }
+
+    public void changeEmail(String token, String email) throws InvalidTokenException, UserNotFoundException {
+        User user = queryUserById((tokenService.getIdByToken(token)));
+    }
+
+    public void changeEmailConfirm(String token, String email, String confirmation_code) throws InvalidTokenException, UserNotFoundException {
+        User user = queryUserById((tokenService.getIdByToken(token)));
+    }
+
+    public void changeBio(String token, String bio) throws InvalidTokenException, UserNotFoundException {
+        Long id = tokenService.getIdByToken(token);
+        User user = queryUserById((tokenService.getIdByToken(token)));
+        userRepository.updateBio(id, bio);
+    }
+
+    public void uploadAvatar(String token, File file) throws InvalidTokenException, UserNotFoundException {
+        User user = queryUserById((tokenService.getIdByToken(token)));
+    }
 }

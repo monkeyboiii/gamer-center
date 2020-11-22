@@ -2,6 +2,7 @@ package com.sustech.gamercenter.security;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,7 @@ public enum UserRole {
             DEVELOPER_READ, DEVELOPER_WRITE
     )),
 
-    GUEST(newHashSet(GAME_READ, PLAYER_READ)),
+    Guest(newHashSet(GAME_READ, PLAYER_READ)),
 
     Player(newHashSet(GAME_READ, PLAYER_READ, PLAYER_WRITE)),
 
@@ -33,7 +34,7 @@ public enum UserRole {
     ));
 
 
-    private Set<UserPermission> permissions;
+    private final Set<UserPermission> permissions;
 
     UserRole(Set<UserPermission> permissions) {
         this.permissions = permissions;
@@ -43,6 +44,13 @@ public enum UserRole {
         return permissions;
     }
 
+    public Set<String> getStringPermissions() {
+        return Arrays
+                .stream(getPermissions().toArray())
+                .map(Object::toString)
+                .collect(Collectors.toSet());
+    }
+
     public Set<SimpleGrantedAuthority> getGrantedAuthorities() {
         Set<SimpleGrantedAuthority> permissions = getPermissions().stream()
                 .map(permission -> new SimpleGrantedAuthority(permission.getPermission()))
@@ -50,4 +58,6 @@ public enum UserRole {
         permissions.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
         return permissions;
     }
+
+
 }

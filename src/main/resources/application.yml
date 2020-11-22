@@ -1,6 +1,14 @@
+server:
+  port: 8080
+
 spring:
   profiles:
     active: dev
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
 
   jackson:
     default-property-inclusion: non_null

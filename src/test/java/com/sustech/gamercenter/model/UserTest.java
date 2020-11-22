@@ -3,8 +3,6 @@ package com.sustech.gamercenter.model;
 
 import org.junit.jupiter.api.Test;
 
-import java.sql.Timestamp;
-
 public class UserTest {
 
     @Test
