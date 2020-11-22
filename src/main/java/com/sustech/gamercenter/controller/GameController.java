@@ -42,7 +42,7 @@ public class GameController {
     @PostMapping("/create")
     public Object createGame(Game game) {
         if (gameService.existedName(game.getName(), -1)) {
-            throw new MyException(1, "游戏名已存在");
+            throw new MyException(-1, "Game's name already existed.");
         }
         return ResultService.success(gameService.save(game));
     }
@@ -57,7 +57,7 @@ public class GameController {
     @PostMapping("/update")
     public Object updateGame(Game game) {
         if (gameService.existedName(game.getName(), game.getId())) {
-            throw new MyException(1, "游戏名已存在");
+            throw new MyException(-1, "Game's name already existed");
         }
         return ResultService.success(gameService.save(game));
     }

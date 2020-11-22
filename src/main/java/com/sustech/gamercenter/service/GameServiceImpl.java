@@ -42,10 +42,10 @@ public class GameServiceImpl implements GameService {
         double price = game.getPrice();
         SimpleDateFormat tempDate = new SimpleDateFormat("yyyy-mm-dd");
         String datetime = tempDate.format(new java.util.Date());
-        if (datetime.compareTo(game.getDiscountStart()) >= 0 && datetime.compareTo(game.getDiscountEnd()) <= 0) {
-            price = price * game.getDiscountRate();
+        if (datetime.compareTo(game.getDiscount_start()) >= 0 && datetime.compareTo(game.getDiscount_end()) <= 0) {
+            price = price * game.getDiscount_rate();
         }
-        userService.transfer(price, userId, game.getDeveloperId());
+        userService.transfer(price, userId, game.getDeveloper_id());
     }
 
 
@@ -67,7 +67,7 @@ public class GameServiceImpl implements GameService {
         gameContentRepository.save(g);
         if(type.equals("image")){
             Game game = gameRepository.findById(id);
-            game.setFrontImage(filename);
+            game.setFront_image(filename);
             gameRepository.save(game);
         }
     }
@@ -110,7 +110,7 @@ public class GameServiceImpl implements GameService {
                 + "resources" + File.separator + "static" + File.separator + "game" + File.separator + type + File.separator + fileName);
 
         if (!file.exists()) {
-            throw new MyException(2, "下载文件不存在");
+            throw new MyException(-1, "File doesn't exist.");
         }
         response.reset();
         response.setContentType("application/octet-stream");
@@ -127,7 +127,7 @@ public class GameServiceImpl implements GameService {
                 os.flush();
             }
         } catch (IOException e) {
-            throw new MyException(3, "下载失败");
+            throw new MyException(-1, "Download fail.");
         }
     }
 

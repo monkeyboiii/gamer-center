@@ -2,7 +2,7 @@ package com.sustech.gamercenter.service;
 
 
 import com.sustech.gamercenter.model.User;
-import com.sustech.gamercenter.repository.UserRepository;
+import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.service.token.SimpleTokenServiceImpl;
 import com.sustech.gamercenter.util.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;

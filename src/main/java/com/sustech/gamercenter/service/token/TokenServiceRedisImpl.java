@@ -1,7 +1,7 @@
 package com.sustech.gamercenter.service.token;
 
 import com.sustech.gamercenter.model.User;
-import com.sustech.gamercenter.repository.UserRepository;
+import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.util.JsonUtil;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
 import com.sustech.gamercenter.util.model.TokenModel;
@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.UUID;

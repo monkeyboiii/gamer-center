@@ -1,4 +1,4 @@
-package com.sustech.gamercenter.repository;
+package com.sustech.gamercenter.dao;
 
 import com.sustech.gamercenter.model.User;
 import io.lettuce.core.dynamic.annotation.Param;

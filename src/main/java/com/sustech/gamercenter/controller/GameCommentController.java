@@ -19,12 +19,10 @@ public class GameCommentController {
 
     @PostMapping
     public Object addComment(@RequestBody GameComment gameComment){
-        try{
-            gameCommentService.addComment(gameComment);
-        }catch (Exception e){
-            return new MyException(5, "该用户已有评论");
-        }
-        return ResultService.success("");
+        if(gameCommentService.addComment(gameComment) == -1)
+            return new MyException(-1, "User has commented.");
+        else
+            return ResultService.success("");
     }
 
     @GetMapping

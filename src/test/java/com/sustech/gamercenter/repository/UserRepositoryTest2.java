@@ -1,5 +1,6 @@
 package com.sustech.gamercenter.repository;
 
+import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.model.User;
 import org.junit.Assert;
 import org.junit.Test;
