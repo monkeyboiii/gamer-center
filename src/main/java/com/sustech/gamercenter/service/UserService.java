@@ -1,11 +1,8 @@
 package com.sustech.gamercenter.service;
 
 
-import com.sustech.gamercenter.model.Game;
-import com.sustech.gamercenter.model.GameContent;
 import com.sustech.gamercenter.dao.PlayerRepository;
 import com.sustech.gamercenter.dao.UserRepository;
-import com.sustech.gamercenter.model.Player;
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
 import com.sustech.gamercenter.util.exception.*;
@@ -16,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @Service
@@ -35,7 +31,6 @@ public class UserService {
     SimpleTokenService tokenService;
 
 
-    private final static String STORAGE_PREFIX = System.getProperty("user.dir");
     /**
      * normal try catch with throwable stacktrace option available
      */
@@ -145,6 +140,14 @@ public class UserService {
 
         userRepository.flush();
     }
+
+
+    //
+    //
+    //
+
+
+    private final static String STORAGE_PREFIX = System.getProperty("user.dir");
 
     public byte[] getAvatar(String id) throws IOException {
         String path = STORAGE_PREFIX + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator

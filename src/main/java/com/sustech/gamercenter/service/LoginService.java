@@ -2,10 +2,7 @@ package com.sustech.gamercenter.service;
 
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
-import com.sustech.gamercenter.util.exception.IncorrectPasswordException;
-import com.sustech.gamercenter.util.exception.InvalidTokenException;
-import com.sustech.gamercenter.util.exception.UserHasNoTokenException;
-import com.sustech.gamercenter.util.exception.UserNotFoundException;
+import com.sustech.gamercenter.util.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +27,11 @@ public class LoginService {
     private PasswordEncoder encoder;
 
 
-    public String loginAuthentication(String email, String password) throws UserNotFoundException, IncorrectPasswordException {
+    public String loginAuthentication(String email, String password, String role) throws UserNotFoundException, IncorrectPasswordException, UserHasNoRoleException {
         User user = userService.queryUserByEmail(email);
-        if (encoder.matches(password, user.getPassword())) {
-            // TODO add more authentication
+        if (role.length() != 1 || !user.getRole().contains(role)) {
+            throw new UserHasNoRoleException("User " + user.getName() + " has no such role");
+        } else if (encoder.matches(password, user.getPassword())) {
             return tokenService.createToken(user);
         } else {
             throw new IncorrectPasswordException("Password incorrect");
