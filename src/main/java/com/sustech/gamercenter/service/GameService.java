@@ -5,6 +5,7 @@ import com.sustech.gamercenter.model.GameContent;
 //import com.sustech.gamercenter.model.GameDiscount;
 import com.sustech.gamercenter.util.exception.InsufficientBalanceException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -30,7 +31,7 @@ public interface GameService {
 
     void download(HttpServletResponse response, String fileName, String type) throws IOException;
 
-    List<Game> search(String tag, String name, int page);
+    Page<Game> search(String tag, String name, int page);
 
 //    public Object findById(long id);
 }
