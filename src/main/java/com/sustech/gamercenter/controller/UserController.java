@@ -3,7 +3,6 @@ package com.sustech.gamercenter.controller;
 
 import com.sustech.gamercenter.security.AuthToken;
 import com.sustech.gamercenter.security.AuthorizationInterceptor;
-import com.sustech.gamercenter.service.PlayerService;
 import com.sustech.gamercenter.service.UserService;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
@@ -31,9 +30,6 @@ public class UserController {
     UserService userService;
 
     @Autowired
-    PlayerService playerService;
-
-    @Autowired
     SimpleTokenService tokenService;
 
     @AuthToken
@@ -50,7 +46,7 @@ public class UserController {
                                      @RequestParam(value = "page_num", defaultValue = "0", required = false) Integer pageNum,
                                      @RequestParam(value = "page_size", defaultValue = "6", required = false) Integer pageSize
     ) {
-        logger.info("tag received: " + tag + "; page" + pageNum + " with size " + pageSize);
+        logger.info("tag received: " + tag + "; page " + pageNum + " with size " + pageSize);
 
         return new JsonResponse(0, "Successfully retrieved");
     }

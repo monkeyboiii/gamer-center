@@ -1,4 +1,4 @@
-package com.sustech.gamercenter.util;
+package com.sustech.gamercenter.util.deprecated;
 
 import java.io.File;
 import java.io.IOException;

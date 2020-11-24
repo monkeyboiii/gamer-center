@@ -1,10 +1,8 @@
-package com.sustech.gamercenter.service.token;
+package com.sustech.gamercenter.util.deprecated;
 
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.dao.UserRepository;
-import com.sustech.gamercenter.util.JsonUtil;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
-import com.sustech.gamercenter.util.model.TokenModel;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -20,10 +20,13 @@ public class AvatarController {
     @Autowired
     UserService userService;
 
+
     @GetMapping(value = "/avatar/{id:[0-9]+}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @ResponseBody
     public byte[] getAvatar(@PathVariable("id") String id) throws IOException {
         return userService.getAvatar(id);
     }
+
 
     @AuthToken
     @PostMapping("/edit/avatar")

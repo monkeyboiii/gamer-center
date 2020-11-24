@@ -1,13 +1,12 @@
 package com.sustech.gamercenter.service;
 
-import com.sustech.gamercenter.util.exception.MyException;
 import com.sustech.gamercenter.dao.GameContentRepository;
-//import com.sustech.gamercenter.dao.GameDiscountRepository;
 import com.sustech.gamercenter.dao.GameRepository;
+import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.model.GameContent;
-//import com.sustech.gamercenter.model.GameDiscount;
 import com.sustech.gamercenter.util.exception.InsufficientBalanceException;
+import com.sustech.gamercenter.util.exception.MyException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +20,9 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+//import com.sustech.gamercenter.dao.GameDiscountRepository;
+//import com.sustech.gamercenter.model.GameDiscount;
+
 @Service
 public class GameServiceImpl implements GameService {
 
@@ -33,7 +35,11 @@ public class GameServiceImpl implements GameService {
 //    @Autowired
 //    private GameDiscountRepository gameDiscountRepository;
 
+    @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     private final static String STORAGE_PREFIX = System.getProperty("user.dir");
 
@@ -41,12 +47,22 @@ public class GameServiceImpl implements GameService {
     public void purchase(long userId, long gameId) throws UserNotFoundException, InsufficientBalanceException {
         Game game = gameRepository.findById(gameId);
         double price = game.getPrice();
-        SimpleDateFormat tempDate = new SimpleDateFormat("yyyy-mm-dd");
+        SimpleDateFormat tempDate = new SimpleDateFormat("yyyy-MM-dd");
         String datetime = tempDate.format(new java.util.Date());
         if (datetime.compareTo(game.getDiscount_start()) >= 0 && datetime.compareTo(game.getDiscount_end()) <= 0) {
             price = price * game.getDiscount_rate();
         }
-        userService.transfer(price, userId, game.getDeveloper_id());
+
+        Long devId = game.getDeveloper_id();
+
+        // add audit record
+        userService.auditPurchase(userId, -price);
+        userService.auditPurchase(devId, price);
+
+        userService.transfer(price, userId, devId);
+        // if no throw, successfully purchased
+
+
     }
 
 
@@ -66,7 +82,7 @@ public class GameServiceImpl implements GameService {
         g.setType(type);
         g.setGameId(id);
         gameContentRepository.save(g);
-        if(type.equals("image")){
+        if (type.equals("image")) {
             Game game = gameRepository.findById(id);
             game.setFront_image(filename);
             gameRepository.save(game);
@@ -138,15 +154,15 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Page<Game> search(String tag, String name, int page){
-        Pageable pageable = PageRequest.of(page,9);
+    public Page<Game> search(String tag, String name, int page) {
+        Pageable pageable = PageRequest.of(page, 9);
 
 //        List<Game> games = gameRepository.findAllByNameLike(name,pageable);
         Page<Game> games;
-        if(tag.equals("") && name.equals("")) games= gameRepository.findAllGame(pageable);
-        else if(tag.equals("")) games= gameRepository.findAllByNameLike(name,pageable);
-        else if(name.equals("")) games= gameRepository.findAllByTag(tag,pageable);
-        else games= gameRepository.findByTagOrNameLike(tag, name,pageable);
+        if (tag.equals("") && name.equals("")) games = gameRepository.findAllGame(pageable);
+        else if (tag.equals("")) games = gameRepository.findAllByNameLike(name, pageable);
+        else if (name.equals("")) games = gameRepository.findAllByTag(tag, pageable);
+        else games = gameRepository.findByTagOrNameLike(tag, name, pageable);
         return games;
 
     }

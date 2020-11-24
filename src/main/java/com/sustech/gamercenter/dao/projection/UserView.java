@@ -1,11 +1,7 @@
 package com.sustech.gamercenter.dao.projection;
 
-import java.util.List;
-
 /**
- * usage at
- * full user info
- * with friends and games
+ * usage at guest peak
  */
 public interface UserView {
 
@@ -13,11 +9,10 @@ public interface UserView {
 
     String getName();
 
+    String getBio();
+
     String getAvatar();
 
     Boolean getOnline();
-
-    List<FriendView> getUser();
-
 
 }

@@ -2,6 +2,7 @@ package com.sustech.gamercenter.service.token;
 
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.dao.UserRepository;
+import com.sustech.gamercenter.util.deprecated.TokenServiceRedisImpl;
 import com.sustech.gamercenter.util.exception.UserHasNoTokenException;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;

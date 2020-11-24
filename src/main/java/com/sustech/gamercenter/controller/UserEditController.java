@@ -8,9 +8,6 @@ import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import com.sustech.gamercenter.util.model.JsonResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/user/edit")
@@ -56,7 +53,6 @@ public class UserEditController {
         userService.changeBio(token, bio);
         return new JsonResponse(0, "Success");
     }
-
 
 
 }

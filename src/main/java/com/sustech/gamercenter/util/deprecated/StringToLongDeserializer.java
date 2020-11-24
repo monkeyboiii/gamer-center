@@ -1,4 +1,4 @@
-package com.sustech.gamercenter.util.json;
+package com.sustech.gamercenter.util.deprecated;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;

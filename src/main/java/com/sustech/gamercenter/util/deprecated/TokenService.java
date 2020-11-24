@@ -1,10 +1,10 @@
-package com.sustech.gamercenter.service.token;
+package com.sustech.gamercenter.util.deprecated;
 
 
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
-import com.sustech.gamercenter.util.model.TokenModel;
+import com.sustech.gamercenter.util.deprecated.TokenModel;
 
 
 public interface TokenService {

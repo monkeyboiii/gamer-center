@@ -1,11 +1,7 @@
-package com.sustech.gamercenter.util.model;
+package com.sustech.gamercenter.util.deprecated;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.deser.std.CollectionDeserializer;
-import com.fasterxml.jackson.databind.ser.std.StringSerializer;
-import com.sustech.gamercenter.model.User;
-import com.sustech.gamercenter.util.json.StringToLongDeserializer;
 
 import java.util.List;
 

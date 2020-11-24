@@ -61,6 +61,8 @@ public class UserService {
     public void registerUser(String name, String email, String password, String role) throws UserRegisterException, UnauthorizedAttemptException {
         if (role.contains("a") || role.contains("t")) {
             throw new UnauthorizedAttemptException("Cannot register admin/tester account");
+        } else if (!role.equals("p") && !role.equals("d") && !role.equals("pd") && !role.equals("dp")) {
+            throw new UserRegisterException("Invalid role selection");
         }
 
         try {
@@ -68,7 +70,7 @@ public class UserService {
             User user = new User(name, email, password, role.toLowerCase());
             userRepository.save(user);
         } catch (Exception e) {
-            throw new UserRegisterException(e.getClass().getSimpleName(), e);
+            throw new UserRegisterException("Username/email already exists", e);
         }
     }
 
@@ -140,6 +142,15 @@ public class UserService {
         userRepository.flush();
     }
 
+    public void auditPurchase(Long id, Double amount) throws UserNotFoundException, InsufficientBalanceException {
+        User user = queryUserById(id);
+        if (user.getBalance() + amount < 0) {
+            throw new InsufficientBalanceException("User  " + user.getName() + " has no sufficient balance");
+        } else {
+            userRepository.auditPurchase(id, amount);
+        }
+    }
+
     public void transfer(Double amount, Long from, Long to) throws UserNotFoundException, InsufficientBalanceException {
         User payer = queryUserById(from);
         User payee = queryUserById(to);
@@ -154,11 +165,36 @@ public class UserService {
         userRepository.flush();
     }
 
+
+    //
+    //
+    //
+    //
+    //
+
+
     public UserInfo getUserInfo(String token) throws InvalidTokenException {
         Long id = tokenService.getIdByToken(token);
         return new UserInfo.builder()
                 .user(userRepository.getOne(id))
                 .friends(userRepository.userHasFriends(id))
                 .build();
+    }
+
+
+    public void friendRequest(String token, String to_user) throws InvalidTokenException, UserNotFoundException {
+        Long id = tokenService.getIdByToken(token);
+        User user = queryUserByEmail(to_user);
+
+        userRepository.friendRequest(id, user.getId());
+
+    }
+
+    public void friendConfirm(String token) {
+
+    }
+
+    public void purchaseGame(String token, Long gameId) {
+
     }
 }

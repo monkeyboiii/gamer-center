@@ -6,7 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "users")
@@ -36,23 +36,22 @@ public class User implements Serializable {
 
     private String bio = "";
 
-
-    @Column(name = "is_online") // TODO change database name
     private Boolean online = false;
-    @Column(name = "is_locked")
     private Boolean locked = false;
 
     @Column(name = "created_at")
-//    @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createdAt;
+    private Timestamp createdAt;
+
+//    @Column(name = "last_online")
+//    private Timestamp lastOnline;
 
     public User() {
     }
 
     // can be used at register
     public User(String name, String email, String password, String role) {
-        this(name, email, password, role, 0.0, false, false, new Date(System.currentTimeMillis()));
+        this(name, email, password, role, 0.0, false, false, new Timestamp(System.currentTimeMillis()));
     }
 
     // for test purposes
@@ -61,7 +60,7 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public User(String name, String email, String password, String role, Double balance, Boolean online, Boolean locked, Date createdAt) {
+    public User(String name, String email, String password, String role, Double balance, Boolean online, Boolean locked, Timestamp createdAt) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -73,6 +72,8 @@ public class User implements Serializable {
     }
 
 
+    //
+    //
     //
 
 
@@ -178,11 +179,11 @@ public class User implements Serializable {
         this.locked = locked;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 }
