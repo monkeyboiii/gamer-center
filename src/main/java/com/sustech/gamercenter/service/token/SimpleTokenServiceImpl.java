@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class SimpleTokenServiceImpl implements SimpleTokenService {
-
+    // todo add more token service
     private static final Logger logger = LoggerFactory.getLogger(TokenServiceRedisImpl.class);
 
     @Autowired
