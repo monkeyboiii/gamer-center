@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class LoginService {
 
@@ -27,12 +30,15 @@ public class LoginService {
     private PasswordEncoder encoder;
 
 
-    public String loginAuthentication(String email, String password, String role) throws UserNotFoundException, IncorrectPasswordException, UserHasNoRoleException {
+    public Map<String, String> loginAuthentication(String email, String password, String role) throws UserNotFoundException, IncorrectPasswordException, UserHasNoRoleException {
         User user = userService.queryUserByEmail(email);
-        if (role.length() != 1 || !user.getRole().contains(role)) {
+        if (role.length() != 1 || !user.getRole().contains(role.toLowerCase())) {
             throw new UserHasNoRoleException("User " + user.getName() + " has no such role");
         } else if (encoder.matches(password, user.getPassword())) {
-            return tokenService.createToken(user);
+            Map<String, String> map = new HashMap<>();
+            map.put("user_id", user.getId().toString());
+            map.put("token", tokenService.createToken(user));
+            return map;
         } else {
             throw new IncorrectPasswordException("Password incorrect");
         }

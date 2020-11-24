@@ -1,7 +1,6 @@
 package com.sustech.gamercenter.controller;
 
 import com.sustech.gamercenter.security.AuthToken;
-import com.sustech.gamercenter.service.ResultService;
 import com.sustech.gamercenter.service.UserService;
 import com.sustech.gamercenter.util.exception.IncorrectPasswordException;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
@@ -18,7 +17,7 @@ import java.io.IOException;
 public class UserEditController {
 
     @Autowired
-    UserService userService; // need revision
+    UserService userService;
 
 
     @AuthToken
@@ -58,12 +57,6 @@ public class UserEditController {
         return new JsonResponse(0, "Success");
     }
 
-//    @AuthToken
-    @PostMapping("/avatar")
-    public JsonResponse upload_avatar(@RequestHeader("token") String token,
-                                      @RequestParam("upload_avatar") MultipartFile uploadPackage) throws UserNotFoundException, InvalidTokenException, IOException {
-        userService.uploadAvatar(token, uploadPackage);
-        return new JsonResponse(0, "Success");
-    }
+
 
 }

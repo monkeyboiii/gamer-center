@@ -1,24 +1,27 @@
 package com.sustech.gamercenter.service;
 
-import com.sustech.gamercenter.dao.PlayerRepository;
-import com.sustech.gamercenter.model.Player;
+//import com.sustech.gamercenter.dao.PlayerRepository;
+
+import com.sustech.gamercenter.dao.UserRepository;
+import com.sustech.gamercenter.dao.projection.FriendView;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PlayerService {
 
     @Autowired
-    PlayerRepository playerRepository;
+    UserRepository userRepository;
 
     @Autowired
     SimpleTokenService tokenService;
 
 
-    public Player getPlayerInfo(String token) throws InvalidTokenException {
-        Player player = playerRepository.getOne(tokenService.getIdByToken(token));
-        return player;
+    public List<FriendView> getPlayerInfo(String token) throws InvalidTokenException {
+        return userRepository.userHasFriends(tokenService.getIdByToken(token));
     }
 }

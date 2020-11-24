@@ -23,7 +23,6 @@ public class LoginController {
     public JsonResponse loginAuthentication(
             @RequestParam("email") String email,
             @RequestParam("password") String password,
-//            @RequestParam("role") String role // TODO, role authentication ensures authorization
             @RequestParam(value = "role", required = false, defaultValue = "p") String role
     ) throws UserNotFoundException, IncorrectPasswordException, UserHasNoRoleException {
         return new JsonResponse.builder()

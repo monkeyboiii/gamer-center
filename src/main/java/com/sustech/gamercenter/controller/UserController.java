@@ -12,10 +12,7 @@ import com.sustech.gamercenter.util.model.JsonResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 
 /**
@@ -41,18 +38,20 @@ public class UserController {
 
     @AuthToken
     @GetMapping("/info")
-    public JsonResponse getPlayerInfo(@RequestHeader("token") String token) throws InvalidTokenException {
-        return new JsonResponse(0, "Success", playerService.getPlayerInfo(token));
+    public JsonResponse getUserInfo(@RequestHeader("token") String token) throws InvalidTokenException {
+        return new JsonResponse(0, "Success", userService.getUserInfo(token));
     }
 
 
     @AuthToken
     @GetMapping("/game")
     public JsonResponse userHasGames(@RequestHeader("token") String token,
-                                     @RequestParam("tag") String tag
+                                     @RequestParam("tag") String tag,
+                                     @RequestParam(value = "page_num", defaultValue = "0", required = false) Integer pageNum,
+                                     @RequestParam(value = "page_size", defaultValue = "6", required = false) Integer pageSize
     ) {
-        logger.info("token received: " + token);
-        logger.info("tag received: " + tag);
+        logger.info("tag received: " + tag + "; page" + pageNum + " with size " + pageSize);
+
         return new JsonResponse(0, "Successfully retrieved");
     }
 
@@ -75,9 +74,4 @@ public class UserController {
     }
 
 
-    @RequestMapping(value = "/avatar/{id:[0-9]+}", produces = MediaType.IMAGE_JPEG_VALUE)
-    @ResponseBody
-    public byte[] getAvatar(@PathVariable("id") String id) throws IOException {
-        return userService.getAvatar(id);
-    }
 }

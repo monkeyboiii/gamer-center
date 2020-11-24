@@ -6,8 +6,11 @@ import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import com.sustech.gamercenter.util.exception.UserRegisterException;
 import com.sustech.gamercenter.util.model.JsonResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 
 /**
@@ -45,11 +48,20 @@ public class GuestController {
     public JsonResponse register(@RequestParam("name") String name,
                                  @RequestParam("email") String email,
                                  @RequestParam("password") String password,
-                                 @RequestParam("role") String role
+                                 @RequestParam(value = "role", defaultValue = "p", required = false) String role
     ) throws UserRegisterException, UnauthorizedAttemptException {
         userService.registerUser(name, email, password, role);
         return new JsonResponse(0, "Successful registered");
     }
+
+
+    @PostMapping("/register/confirm")
+    public JsonResponse registerConfirm(@RequestParam("confirm") String confirmationCode) {
+        // confirmationCode in email
+        return new JsonResponse(0, "Successfully registered");
+    }
+
+
 
 }
 

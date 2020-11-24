@@ -2,6 +2,20 @@ server:
   port: 80
 
 spring:
+  profiles:
+    active: dev
+
+  #  datasource:
+  #    driver-class-name: com.mysql.cj.jdbc.Driver
+  #    url: jdbc:mysql://47.115.76.10:3306/ooad_project?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT
+  #    username: ooad
+  #    password: ooadpassword
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
   redis:
     database: 0
     host: 127.0.0.1
@@ -15,26 +29,13 @@ spring:
         max-idle: 8
         min-idle: 0
 
-  profiles:
-    active: dev
-
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://47.115.76.10:3306/ooad_project?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT
-    username: ooad
-    password: ooadpassword
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-
   jackson:
     default-property-inclusion: non_null
     serialization:
       fail-on-empty-beans: false
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
 
-  # Hot reload in dev
   devtools:
     add-properties: true
 
@@ -43,11 +44,11 @@ spring:
       enabled: true
       location: /data/
       max-file-size: 1MB
-      max-request-size: 5MB
+      max-request-size: 5000MB
       resolve-lazily: false
       file-size-threshold: 0
 
-mybatis:
-  mapper-locations:
-    - classpath:mapper/*.xml
-    - classpath*:com/**/mapper/*.xml
+#mybatis:
+#  mapper-locations:
+#    - classpath:mapper/*.xml
+#    - classpath*:com/**/mapper/*.xml

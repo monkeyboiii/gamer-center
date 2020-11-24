@@ -2,54 +2,78 @@ package com.sustech.gamercenter.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.sql.Date;
 
 @Entity
 @Table(name = "users")
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    protected Long id;
+    private Long id;
 
-    @Column(name = "name", unique = true, nullable = false)
-    protected String name;
+    @Column(unique = true, nullable = false)
+    private String name;
 
-    @Column(name = "email", unique = true, nullable = false)
-    protected String email;
+    @Column(unique = true, nullable = false)
+    private String email;
 
     @JsonIgnore
-    @Column(name = "password", nullable = false)
-    protected String password;
+    @Column(nullable = false)
+    private String password;
 
-    @Column(name = "role", nullable = false)
-    protected String role; // combinations
+    @Column(nullable = false)
+    private String role = "p"; // combinations
 
-    @Column
-    protected Double balance;
+    private Double balance = 0.0;
 
-    @Column
-    protected String avatar;
+    private String avatar;
 
-    @Column
-    protected String bio;
+    private String bio = "";
 
 
-    @Column
-    protected Boolean is_online = false;
-    @Column
-    protected Boolean is_locked = false;
+    @Column(name = "is_online") // TODO change database name
+    private Boolean online = false;
+    @Column(name = "is_locked")
+    private Boolean locked = false;
 
-    @Column
+    @Column(name = "created_at")
+//    @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    protected Timestamp created_at;
+    private Date createdAt;
+
+    public User() {
+    }
+
+    // can be used at register
+    public User(String name, String email, String password, String role) {
+        this(name, email, password, role, 0.0, false, false, new Date(System.currentTimeMillis()));
+    }
+
+    // for test purposes
+    public User(Long id, String name, String email, String password, String role) {
+        this(name, email, password, role);
+        this.id = id;
+    }
+
+    public User(String name, String email, String password, String role, Double balance, Boolean online, Boolean locked, Date createdAt) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.balance = balance;
+        this.role = role;
+        this.online = online;
+        this.locked = locked;
+        this.createdAt = createdAt;
+    }
+
+
+    //
 
 
     @Override
@@ -60,35 +84,10 @@ public class User implements Serializable {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
-                ", is_online=" + is_online +
-                ", is_locked=" + is_locked +
-                ", created_at=" + created_at +
+                ", online=" + online +
+                ", locked=" + locked +
+                ", createdAt=" + createdAt +
                 '}';
-    }
-
-    public User() {
-    }
-
-    // can be used at register
-    public User(String name, String email, String password, String role) {
-        this(name, email, password, role, 0.0, false, false, new Timestamp(System.currentTimeMillis()));
-    }
-
-    // for test purposes
-    public User(Long id, String name, String email, String password, String role) {
-        this(name, email, password, role);
-        this.id = id;
-    }
-
-    public User(String name, String email, String password, String role, Double balance, Boolean is_online, Boolean is_locked, Timestamp created_at) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.balance = balance;
-        this.role = role;
-        this.is_online = is_online;
-        this.is_locked = is_locked;
-        this.created_at = created_at;
     }
 
     @Override
@@ -163,27 +162,27 @@ public class User implements Serializable {
         this.bio = bio;
     }
 
-    public Boolean isIs_online() {
-        return is_online;
+    public Boolean getOnline() {
+        return online;
     }
 
-    public void setIs_online(Boolean is_online) {
-        this.is_online = is_online;
+    public void setOnline(Boolean online) {
+        this.online = online;
     }
 
-    public Boolean isIs_locked() {
-        return is_locked;
+    public Boolean getLocked() {
+        return locked;
     }
 
-    public void setIs_locked(Boolean is_locked) {
-        this.is_locked = is_locked;
+    public void setLocked(Boolean locked) {
+        this.locked = locked;
     }
 
-    public Timestamp getCreated_at() {
-        return created_at;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreated_at(Timestamp created_at) {
-        this.created_at = created_at;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 }

@@ -37,16 +37,21 @@ public class AdminService {
         }
     }
 
-    public void assignRole(Long Id, String role) throws UserNotFoundException {
-        User user = userService.queryUserById(Id);
+    public void assignRole(Long id, String role) throws UserNotFoundException {
+        User user = userService.queryUserById(id);
         user.setRole(role);
         userRepository.flush();
     }
 
-    public void lockOrUnlockAccount(Long Id, Boolean lock) throws UserNotFoundException {
-        User user = userService.queryUserById(Id);
-        user.setIs_locked(lock);
+    public void lockOrUnlockAccount(Long id, Boolean lock) throws UserNotFoundException {
+        User user = userService.queryUserById(id);
+        user.setLocked(lock);
         userRepository.flush();
+    }
+
+    //    public List<UserView> getUserList(String filter, String value, Integer pageNum, Integer pageSize) {
+    public void getUserList(String filter, String value, Integer pageNum, Integer pageSize) {
+        userRepository.findAll();
     }
 
 }

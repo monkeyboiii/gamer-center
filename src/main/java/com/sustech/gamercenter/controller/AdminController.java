@@ -34,9 +34,10 @@ public class AdminController {
     public JsonResponse getUserList(@RequestHeader("token") String token,
                                     @RequestParam(value = "filter", required = false) String filter,
                                     @RequestParam(value = "value", required = false) String value,
-                                    @RequestParam(value = "page", required = false) Integer page
+                                    @RequestParam(value = "page_num", required = false, defaultValue = "0") Integer pageNum,
+                                    @RequestParam(value = "page_size", required = false, defaultValue = "6") Integer pageSize
     ) {
-
+        adminService.getUserList(filter, value, pageNum, pageSize);
         return new JsonResponse(0, "Successfully retrieved");
     }
 

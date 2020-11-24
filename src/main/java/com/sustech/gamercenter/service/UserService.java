@@ -1,11 +1,13 @@
 package com.sustech.gamercenter.service;
 
 
-import com.sustech.gamercenter.dao.PlayerRepository;
+//import com.sustech.gamercenter.dao.PlayerRepository;
+
 import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
 import com.sustech.gamercenter.util.exception.*;
+import com.sustech.gamercenter.util.model.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,9 +25,6 @@ public class UserService {
 
     @Autowired
     UserRepository userRepository;
-
-    @Autowired
-    PlayerRepository playerRepository;
 
     @Autowired
     SimpleTokenService tokenService;
@@ -59,19 +58,33 @@ public class UserService {
                         new UserNotFoundException("User with email " + email + " doesn't exist"));
     }
 
-    public User registerUser(String name, String email, String password, String role) throws UserRegisterException, UnauthorizedAttemptException {
+    public void registerUser(String name, String email, String password, String role) throws UserRegisterException, UnauthorizedAttemptException {
         if (role.contains("a") || role.contains("t")) {
             throw new UnauthorizedAttemptException("Cannot register admin/tester account");
         }
 
         try {
             password = encoder.encode(password);
-            User user = new User(name, email, password, role);
+            User user = new User(name, email, password, role.toLowerCase());
             userRepository.save(user);
-            return user;
         } catch (Exception e) {
             throw new UserRegisterException(e.getClass().getSimpleName(), e);
         }
+    }
+
+    // TODO add email confirmation, confirmationCode stores in redis
+//    public void registerUserConfirm(String email,String confirmationCode){}
+
+    private final static String STORAGE_PREFIX = System.getProperty("user.dir");
+
+    public byte[] getAvatar(String id) throws IOException {
+        String path = STORAGE_PREFIX + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
+                + "static" + File.separator + "user" + File.separator + "avatar" + File.separator + id + ".jpg";
+        File file = new File(path);
+        FileInputStream inputStream = new FileInputStream(file);
+        byte[] bytes = new byte[inputStream.available()];
+        inputStream.read(bytes, 0, inputStream.available());
+        return bytes;
     }
 
 
@@ -141,22 +154,11 @@ public class UserService {
         userRepository.flush();
     }
 
-
-    //
-    //
-    //
-
-
-    private final static String STORAGE_PREFIX = System.getProperty("user.dir");
-
-    public byte[] getAvatar(String id) throws IOException {
-        String path = STORAGE_PREFIX + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
-                + "static" + File.separator + "user" + File.separator + "avatar" + File.separator + id + ".jpg";
-        File file = new File(path);
-        FileInputStream inputStream = new FileInputStream(file);
-        byte[] bytes = new byte[inputStream.available()];
-        inputStream.read(bytes, 0, inputStream.available());
-        return bytes;
+    public UserInfo getUserInfo(String token) throws InvalidTokenException {
+        Long id = tokenService.getIdByToken(token);
+        return new UserInfo.builder()
+                .user(userRepository.getOne(id))
+                .friends(userRepository.userHasFriends(id))
+                .build();
     }
-
 }
