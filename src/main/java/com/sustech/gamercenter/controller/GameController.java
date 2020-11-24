@@ -77,7 +77,7 @@ public class GameController {
 
     @GetMapping("/list")
     public Object search(@RequestParam("tag") String tag, @RequestParam("name") String name, @RequestParam("page") int page){
-        return gameService.search(tag, name,page);
+        return ResultService.success(gameService.search(tag, name,page));
 //        return ResultService.success(gameService.search(tag, name));
     }
 

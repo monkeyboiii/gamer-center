@@ -10,6 +10,7 @@ import com.sustech.gamercenter.model.GameContent;
 import com.sustech.gamercenter.util.exception.InsufficientBalanceException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -137,11 +138,11 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<Game> search(String tag, String name, int page){
-        Pageable pageable = PageRequest.of(page,10);
+    public Page<Game> search(String tag, String name, int page){
+        Pageable pageable = PageRequest.of(page,9);
 
 //        List<Game> games = gameRepository.findAllByNameLike(name,pageable);
-        List<Game> games;
+        Page<Game> games;
         if(tag.equals("") && name.equals("")) games= gameRepository.findAllGame(pageable);
         else if(tag.equals("")) games= gameRepository.findAllByNameLike(name,pageable);
         else if(name.equals("")) games= gameRepository.findAllByTag(tag,pageable);
