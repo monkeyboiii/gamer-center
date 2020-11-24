@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 //import com.sustech.gamercenter.dao.GameDiscountRepository;
@@ -159,10 +160,14 @@ public class GameServiceImpl implements GameService {
 
 //        List<Game> games = gameRepository.findAllByNameLike(name,pageable);
         Page<Game> games;
-        if (tag.equals("") && name.equals("")) games = gameRepository.findAllGame(pageable);
-        else if (tag.equals("")) games = gameRepository.findAllByNameLike(name, pageable);
-        else if (name.equals("")) games = gameRepository.findAllByTag(tag, pageable);
-        else games = gameRepository.findByTagOrNameLike(tag, name, pageable);
+
+        SimpleDateFormat tempDate = new SimpleDateFormat("yyyy-MM-dd");
+        String today = tempDate.format(new java.util.Date());
+
+        if (tag.equals("") && name.equals("")) games = gameRepository.findAllGame(today,pageable);
+        else if (tag.equals("")) games = gameRepository.findAllByNameLike(name, today,pageable);
+        else if (name.equals("")) games = gameRepository.findAllByTag(tag,today, pageable);
+        else games = gameRepository.findByTagOrNameLike(tag, name,today, pageable);
         return games;
 
     }
