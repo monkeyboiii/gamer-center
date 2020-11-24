@@ -1,10 +1,10 @@
 package com.sustech.gamercenter.service.token;
 
-import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.dao.UserRepository;
+import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.util.deprecated.TokenServiceRedisImpl;
-import com.sustech.gamercenter.util.exception.UserHasNoTokenException;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
+import com.sustech.gamercenter.util.exception.UserHasNoTokenException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,8 +94,8 @@ public class SimpleTokenServiceImpl implements SimpleTokenService {
     @Override
     public void deleteToken(String token) throws InvalidTokenException, UserHasNoTokenException {
         Long id = getIdByToken(token);
-        deleteToken(id);
         redisTemplate.delete(token);
+        redisTemplate.delete(id.toString());
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.sustech.gamercenter.dao.projection;
 
 public interface GameView {
-    Long getId();
+    long getId();
 
     String getName();
 

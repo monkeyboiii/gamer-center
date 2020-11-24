@@ -4,7 +4,6 @@ package com.sustech.gamercenter.controller;
 import com.sustech.gamercenter.security.AuthToken;
 import com.sustech.gamercenter.security.AuthorizationInterceptor;
 import com.sustech.gamercenter.service.UserService;
-import com.sustech.gamercenter.service.token.SimpleTokenService;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import com.sustech.gamercenter.util.model.JsonResponse;
@@ -29,8 +28,6 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @Autowired
-    SimpleTokenService tokenService;
 
     @AuthToken
     @GetMapping("/info")
@@ -55,6 +52,7 @@ public class UserController {
     @AuthToken
     @GetMapping("/collection")
     public JsonResponse getCollection(@RequestHeader("token") String token) {
+        // todo
         logger.info("token received: " + token);
         return new JsonResponse(0, "Successfully retrieved");
     }

@@ -2,6 +2,7 @@ package com.sustech.gamercenter.dao;
 
 import com.sustech.gamercenter.dao.projection.FriendView;
 import com.sustech.gamercenter.dao.projection.GameView;
+import com.sustech.gamercenter.model.Message;
 import com.sustech.gamercenter.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

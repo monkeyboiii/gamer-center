@@ -16,31 +16,26 @@ public class UserInfo extends User {
 
     private List<?> friends;
     private List<?> games;
+    private List<?> messages;
 
 
-    public UserInfo(User user, List<?> friends, List<?> games) {
+    public UserInfo(User user, List<?> friends, List<?> games, List<?> messages) {
         super(user.getName(), user.getEmail(), null, user.getRole(), user.getBalance(), user.getOnline(), user.getLocked(), user.getCreatedAt());
         this.setId(user.getId());
         this.registeredAt = new Date(user.getCreatedAt().getTime());
         this.friends = friends;
         this.games = games;
+        this.messages = messages;
     }
 
     public UserInfo() {
-    }
-
-    public void setFriends(List<?> friends) {
-        this.friends = friends;
-    }
-
-    public void setGames(List<?> games) {
-        this.games = games;
     }
 
     public static final class builder {
         User user;
         List<?> friends;
         List<?> games;
+        List<?> messages;
 
         public builder user(User user) {
             this.user = user;
@@ -57,8 +52,13 @@ public class UserInfo extends User {
             return this;
         }
 
+        public builder messages(List<?> message) {
+            this.messages = messages;
+            return this;
+        }
+
         public UserInfo build() {
-            return new UserInfo(user, friends, games);
+            return new UserInfo(user, friends, games, messages);
         }
     }
 
@@ -76,5 +76,21 @@ public class UserInfo extends User {
 
     public List<?> getGames() {
         return games;
+    }
+
+    public void setFriends(List<?> friends) {
+        this.friends = friends;
+    }
+
+    public void setGames(List<?> games) {
+        this.games = games;
+    }
+
+    public List<?> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<?> messages) {
+        this.messages = messages;
     }
 }

@@ -1,8 +1,7 @@
 package com.sustech.gamercenter.service;
 
 
-//import com.sustech.gamercenter.dao.PlayerRepository;
-
+import com.sustech.gamercenter.dao.MessageRepository;
 import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
@@ -24,10 +23,13 @@ public class UserService {
     PasswordEncoder encoder;
 
     @Autowired
+    SimpleTokenService tokenService;
+
+    @Autowired
     UserRepository userRepository;
 
     @Autowired
-    SimpleTokenService tokenService;
+    MessageRepository messageRepository;
 
 
     /**
@@ -172,15 +174,18 @@ public class UserService {
     //
     //
 
-
+    /**
+     * retrieve the most specific user info in a wrapper class
+     */
     public UserInfo getUserInfo(String token) throws InvalidTokenException {
         Long id = tokenService.getIdByToken(token);
         return new UserInfo.builder()
                 .user(userRepository.getOne(id))
                 .friends(userRepository.userHasFriends(id))
+                .games(userRepository.userHasGames(id))
+                .messages(messageRepository.findAllByUserIdAndUnread(id, true))
                 .build();
     }
-
 
     public void friendRequest(String token, String to_user) throws InvalidTokenException, UserNotFoundException {
         Long id = tokenService.getIdByToken(token);
@@ -194,7 +199,5 @@ public class UserService {
 
     }
 
-    public void purchaseGame(String token, Long gameId) {
 
-    }
 }
