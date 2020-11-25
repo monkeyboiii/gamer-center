@@ -37,6 +37,23 @@ create index idx_users_friends_users1
 create index idx_users_friends_users2
     on users_friends (to_user_id);
 
+create table users_messages
+(
+    id      bigint auto_increment,
+    source  bigint default 0    null,
+    user_id bigint              not null,
+    message varchar(255)        not null,
+    unread  bit    default b'0' not null,
+    constraint users_messages_id_uindex
+        unique (id),
+    constraint users_messages_users_id_fk
+        foreign key (user_id) references users (id)
+)
+    comment 'unread_messages';
+
+alter table users_messages
+    add primary key (id);
+
 create table users_purchases
 (
     id             bigint auto_increment,
@@ -77,17 +94,3 @@ create index fk_users_games_user_history1_idx
 
 create index fk_users_games_users1_idx
     on users_games (user_id);
-
-create table users_messages
-(
-    id      bigint auto_increment primary key,
-    user_id bigint            not null,
-    message varchar(255)      not null,
-    unread  bool default true not null,
-    constraint users_messages_users_id_fk
-        foreign key (user_id) references users (id)
-)
-    comment 'unread_messages';
-
-create unique index users_messages_id_uindex
-    on users_messages (id);
