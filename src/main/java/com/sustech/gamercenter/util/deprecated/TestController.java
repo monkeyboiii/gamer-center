@@ -2,9 +2,15 @@ package com.sustech.gamercenter.util.deprecated;
 
 import com.sustech.gamercenter.dao.MessageRepository;
 import com.sustech.gamercenter.dao.UserRepository;
+import com.sustech.gamercenter.service.AdminService;
 import com.sustech.gamercenter.service.UserService;
+import com.sustech.gamercenter.util.exception.InvalidTokenException;
+import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/test")
@@ -18,6 +24,9 @@ public class TestController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    AdminService adminService;
 
     @GetMapping("/game")
     public Object userHasGames(@RequestParam("user_id") Long id) {
@@ -38,6 +47,12 @@ public class TestController {
     public Object friendReq() {
         userRepository.friendRequest(15732L, 15734L);
         return "ok";
+    }
+
+    @PostMapping("/manual")
+    public Object manual(@RequestParam("manual") MultipartFile manual) throws IOException {
+        adminService.uploadManual(manual);
+        return "agf";
     }
 
 

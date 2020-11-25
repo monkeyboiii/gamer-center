@@ -1,5 +1,6 @@
 package com.sustech.gamercenter.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -40,7 +41,7 @@ public class User implements Serializable {
     private Boolean locked = false;
 
     @Column(name = "created_at")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp createdAt;
 
 //    @Column(name = "last_online")

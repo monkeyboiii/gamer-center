@@ -36,14 +36,21 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<GameView> userHasGames(Long id);
 
 
-    @Query(value = "select u.name, um.message,um.created_at " +
+    @Query(value = "select * " +
+            "from game " +
+            "where tag = ?2 and " +
+            "id in (select game_id from users_games where user_id = ?1)", nativeQuery = true)
+    List<GameView> userHasGamesWithTag(Long id, String tag);
+
+
+    @Query(value = "select um.id, u.name, um.source, um.type, um.message, um.unread, um.created_at " +
             "from users_messages um " +
             "left join users u on um.source = u.id " +
             "where user_id = ?1 and unread =?2 ", nativeQuery = true)
     List<MessageView> userHasUnreadMessages(Long id, Boolean unread);
 
 
-    @Query(value = "select u.name, um.message,um.created_at " +
+    @Query(value = "select um.id, u.name, um.source, um.type, um.message, um.unread, um.created_at " +
             "from users_messages um " +
             "left join users u on um.source = u.id " +
             "where user_id = ?1 ", nativeQuery = true)
@@ -67,4 +74,20 @@ public interface UserRepository extends JpaRepository<User, Long> {
             " values(?1,?2,(select balance from users where id = ?1))", nativeQuery = true)
     @Transactional
     void auditPurchase(Long id, Double price);
+
+
+    @Modifying
+    @Query(value = "insert into " +
+            "users_messages(source, user_id, type, message) " +
+            "values(?1, ?2, ?3, ?4)", nativeQuery = true)
+    @Transactional
+    void sendMessage(Long from, Long to, String type, String message);
+
+
+    @Modifying
+    @Query(value = "update users_messages " +
+            "set unread = false " +
+            "where id = ?1", nativeQuery = true)
+    @Transactional
+    void readMessage(Long id);
 }

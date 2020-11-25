@@ -1,5 +1,6 @@
 package com.sustech.gamercenter.util.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sustech.gamercenter.model.User;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -11,7 +12,7 @@ import java.util.List;
  */
 public class UserInfo extends User {
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date registeredAt;
 
     private List<?> friends;

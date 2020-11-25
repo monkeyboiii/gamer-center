@@ -19,10 +19,6 @@ create table users
         unique (name)
 );
 
-insert into users
-values (0, 'system', 'system@gmail.com', 'no login function', 1000000, 'adpt', '', 'I\'m system bot', true, true, now(),
-        null);
-
 create table users_friends
 (
     from_user_id bigint                        not null,
@@ -43,11 +39,12 @@ create index idx_users_friends_users2
 
 create table users_messages
 (
-    id      bigint auto_increment,
-    source  bigint default 0    null,
-    user_id bigint              not null,
-    message varchar(255)        not null,
-    unread  bit    default b'0' not null,
+    id         bigint auto_increment,
+    source     bigint    default 0                 null,
+    user_id    bigint                              not null,
+    message    varchar(255)                        not null,
+    unread     bit       default b'0'              not null,
+    created_at timestamp default CURRENT_TIMESTAMP null,
     constraint users_messages_id_uindex
         unique (id),
     constraint users_messages_users_id_fk
@@ -81,6 +78,7 @@ create table users_games
     game_id     bigint            not null,
     purchase_id bigint            not null,
     valid       tinyint default 1 not null,
+    user_tag    varchar(45)       null,
     primary key (user_id, game_id, valid),
     constraint fk_users_games_games
         foreign key (game_id) references game (id),
@@ -98,3 +96,11 @@ create index fk_users_games_user_history1_idx
 
 create index fk_users_games_users1_idx
     on users_games (user_id);
+
+
+#
+
+
+insert into users
+values (0, 'system', 'system@gmail.com', 'no login function', 1000000, 'adpt', '', 'I\'m system bot', true, true, now(),
+        null);

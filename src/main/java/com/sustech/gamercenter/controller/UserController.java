@@ -10,6 +10,7 @@ import com.sustech.gamercenter.util.model.JsonResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -42,10 +43,8 @@ public class UserController {
                                      @RequestParam("tag") String tag,
                                      @RequestParam(value = "page_num", defaultValue = "0", required = false) Integer pageNum,
                                      @RequestParam(value = "page_size", defaultValue = "6", required = false) Integer pageSize
-    ) {
-        logger.info("tag received: " + tag + "; page " + pageNum + " with size " + pageSize);
-
-        return new JsonResponse(0, "Successfully retrieved");
+    ) throws InvalidTokenException {
+        return new JsonResponse(0, "Successfully retrieved", userService.userHasGamesInTag(token, tag));
     }
 
 
@@ -60,12 +59,47 @@ public class UserController {
 
     @AuthToken
     @GetMapping("/account/topup")
-    public JsonResponse topUpAccount(@RequestHeader("token") String token,
-                                     @RequestParam("amount") Double amount
+    public JsonResponse topUp(@RequestHeader("token") String token,
+                              @RequestParam("amount") Double amount
     ) throws UserNotFoundException, InvalidTokenException {
-        userService.topup(token, amount);
+        userService.topUp(token, amount);
         return new JsonResponse(0, "Successfully topped up");
     }
 
 
+    @AuthToken
+    @PostMapping("/friend/request")
+    public JsonResponse sendFriendRequest(@RequestHeader("token") String token,
+                                          @RequestParam(value = "user_id", required = false) Long id,
+                                          @RequestParam(value = "user_name", required = false) String name,
+                                          @RequestParam(value = "user_email", required = false) String email) throws UserNotFoundException, InvalidTokenException {
+        if (id != null) {
+            userService.sendFriendRequest(token, id.toString(), "id");
+        } else if (!StringUtils.isEmpty(name)) {
+            userService.sendFriendRequest(token, name, "name");
+        } else if (!StringUtils.isEmpty(email)) {
+            userService.sendFriendRequest(token, email, "email");
+        } else {
+            return new JsonResponse(-1, "At least one field is required");
+        }
+        return new JsonResponse(0, "Successfully sent");
+    }
+
+
+    @AuthToken
+    @PostMapping("/friend/confirm")
+    public JsonResponse confirmFriendRequest(@RequestHeader("token") String token,
+                                             @RequestParam("from") Long from) throws InvalidTokenException {
+        userService.confirmFriendRequest(token, from);
+        return new JsonResponse(0, "Successfully confirmed");
+    }
+
+
+    @AuthToken
+    @PostMapping("/message/read")
+    public JsonResponse readMessage(@RequestHeader("token") String token,
+                                    @RequestParam("id") Long id) throws InvalidTokenException {
+        userService.readMessage(id);
+        return new JsonResponse(0, "Message marked as read");
+    }
 }

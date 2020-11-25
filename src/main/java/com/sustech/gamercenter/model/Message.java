@@ -1,5 +1,7 @@
 package com.sustech.gamercenter.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 
@@ -9,20 +11,23 @@ public class Message {
 
     @Id
     @GeneratedValue
-    private Long Id;
+    private Long id;
     private Long source = 0L;
 
     @Column(name = "user_id")
     private Long userId;
+    private String type;
     private String message;
     private Boolean unread = true;
 
     @Column(name = "created_at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp createdAt;
 
-    public Message(Long id, Long source, Long userId, String message, Boolean unread) {
-        Id = id;
+    public Message(Long id, Long source, Long userId, String type, String message, Boolean unread) {
+        this.id = id;
         this.source = source;
+        this.type = type;
         this.userId = userId;
         this.message = message;
         this.unread = unread;
@@ -33,11 +38,11 @@ public class Message {
     }
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
-        Id = id;
+        this.id = id;
     }
 
     public Long getSource() {
@@ -54,6 +59,14 @@ public class Message {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getMessage() {

@@ -3,6 +3,7 @@ package com.sustech.gamercenter.service;
 
 import com.sustech.gamercenter.dao.MessageRepository;
 import com.sustech.gamercenter.dao.UserRepository;
+import com.sustech.gamercenter.dao.projection.GameView;
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
 import com.sustech.gamercenter.util.exception.*;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -76,8 +78,10 @@ public class UserService {
         }
     }
 
+
     // TODO add email confirmation, confirmationCode stores in redis
 //    public void registerUserConfirm(String email,String confirmationCode){}
+
 
     private final static String STORAGE_PREFIX = System.getProperty("user.dir");
 
@@ -89,6 +93,18 @@ public class UserService {
         byte[] bytes = new byte[inputStream.available()];
         inputStream.read(bytes, 0, inputStream.available());
         return bytes;
+    }
+
+    public void uploadAvatar(String token, MultipartFile avatar) throws InvalidTokenException, UserNotFoundException, IOException {
+        User user = queryUserById((tokenService.getIdByToken(token)));
+
+        String path = File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
+                + "static" + File.separator + "user" + File.separator + "avatar";
+        String realPath = STORAGE_PREFIX + path;
+        File dir = new File(realPath);
+        String filename = user.getId().toString() + ".jpg";
+        File fileServer = new File(dir, filename);
+        avatar.transferTo(fileServer);
     }
 
 
@@ -126,19 +142,7 @@ public class UserService {
         userRepository.flush();
     }
 
-    public void uploadAvatar(String token, MultipartFile avatar) throws InvalidTokenException, UserNotFoundException, IOException {
-        User user = queryUserById((tokenService.getIdByToken(token)));
-
-        String path = File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
-                + "static" + File.separator + "user" + File.separator + "avatar";
-        String realPath = STORAGE_PREFIX + path;
-        File dir = new File(realPath);
-        String filename = user.getId().toString() + ".jpg";
-        File fileServer = new File(dir, filename);
-        avatar.transferTo(fileServer);
-    }
-
-    public void topup(String token, Double amount) throws InvalidTokenException, UserNotFoundException {
+    public void topUp(String token, Double amount) throws InvalidTokenException, UserNotFoundException {
         User user = queryUserById((tokenService.getIdByToken(token)));
         user.setBalance(user.getBalance() + amount);
         userRepository.flush();
@@ -174,6 +178,7 @@ public class UserService {
     //
     //
 
+
     /**
      * retrieve the most specific user info in a wrapper class
      */
@@ -189,17 +194,42 @@ public class UserService {
                 .build();
     }
 
-    public void friendRequest(String token, String to_user) throws InvalidTokenException, UserNotFoundException {
+    public void sendFriendRequest(String token, String value, String method) throws InvalidTokenException, UserNotFoundException {
         Long id = tokenService.getIdByToken(token);
-        User user = queryUserByEmail(to_user);
+        Long to_user_id;
 
-        userRepository.friendRequest(id, user.getId());
+        if (method.equals("id")) {
+            to_user_id = new Long(value);
+        } else if (method.equals("name")) {
+            to_user_id = queryUserByName(value).getId();
+        } else { // email
+            to_user_id = queryUserByEmail(value).getId();
+        }
 
+        userRepository.friendRequest(id, to_user_id);
+        userRepository.sendMessage(id, to_user_id, "friend request", "Please add me as a friend");
     }
 
-    public void friendConfirm(String token) {
-
+    public void confirmFriendRequest(String token, Long from) throws InvalidTokenException {
+        Long confirm_id = tokenService.getIdByToken(token);
+        userRepository.confirmFriendRequest(from, confirm_id);
+        userRepository.sendMessage(confirm_id, from, "reply", "I've accepted your friend request");
     }
 
+    public void readMessage(Long id) {
+        userRepository.readMessage(id);
+    }
+
+
+    //
+    //
+    //
+    //
+    //
+
+
+    public List<GameView> userHasGamesInTag(String token, String tag) throws InvalidTokenException {
+        return userRepository.userHasGamesWithTag(tokenService.getIdByToken(token), tag);
+    }
 
 }

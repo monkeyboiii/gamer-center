@@ -6,11 +6,8 @@ import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import com.sustech.gamercenter.util.exception.UserRegisterException;
 import com.sustech.gamercenter.util.model.JsonResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 
 /**
@@ -32,6 +29,7 @@ public class GuestController {
                                     @RequestParam(value = "user_name", required = false) String name,
                                     @RequestParam(value = "user_email", required = false) String email
     ) throws UserNotFoundException {
+        // TODO return less information
         if (user_id != null) {
             return new JsonResponse(0, "Success", userService.queryUserById(user_id));
         } else if (!StringUtils.isEmpty(name)) {
@@ -56,11 +54,11 @@ public class GuestController {
 
 
     @PostMapping("/register/confirm")
-    public JsonResponse registerConfirm(@RequestParam("confirm") String confirmationCode) {
+    public JsonResponse registerConfirm(@RequestParam("email") String enail,
+                                        @RequestParam("confirm") String confirmationCode) {
         // confirmationCode in email
-        return new JsonResponse(0, "Successfully registered");
+        return new JsonResponse(0, "No impl. Successfully registered");
     }
-
 
 
 }
