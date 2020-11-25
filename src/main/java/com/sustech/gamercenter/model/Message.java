@@ -1,6 +1,7 @@
 package com.sustech.gamercenter.model;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "users_messages")
@@ -14,7 +15,10 @@ public class Message {
     @Column(name = "user_id")
     private Long userId;
     private String message;
-    private Boolean unread = false;
+    private Boolean unread = true;
+
+    @Column(name = "created_at")
+    private Timestamp createdAt;
 
     public Message(Long id, Long source, Long userId, String message, Boolean unread) {
         Id = id;
@@ -22,6 +26,7 @@ public class Message {
         this.userId = userId;
         this.message = message;
         this.unread = unread;
+        this.createdAt = new Timestamp(System.currentTimeMillis());
     }
 
     public Message() {
@@ -65,5 +70,13 @@ public class Message {
 
     public void setUnread(Boolean unread) {
         this.unread = unread;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 }

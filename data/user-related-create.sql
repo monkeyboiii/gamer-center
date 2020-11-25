@@ -19,6 +19,10 @@ create table users
         unique (name)
 );
 
+insert into users
+values (0, 'system', 'system@gmail.com', 'no login function', 1000000, 'adpt', '', 'I\'m system bot', true, true, now(),
+        null);
+
 create table users_friends
 (
     from_user_id bigint                        not null,

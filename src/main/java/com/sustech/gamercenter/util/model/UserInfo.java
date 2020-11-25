@@ -52,7 +52,7 @@ public class UserInfo extends User {
             return this;
         }
 
-        public builder messages(List<?> message) {
+        public builder messages(List<?> messages) {
             this.messages = messages;
             return this;
         }

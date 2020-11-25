@@ -1,14 +1,12 @@
 package com.sustech.gamercenter.controller;
 
-import com.sustech.gamercenter.util.exception.MyException;
 import com.sustech.gamercenter.model.Game;
-//import com.sustech.gamercenter.model.GameDiscount;
 import com.sustech.gamercenter.service.GameService;
 import com.sustech.gamercenter.service.ResultService;
 import com.sustech.gamercenter.util.exception.InsufficientBalanceException;
+import com.sustech.gamercenter.util.exception.MyException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+//import com.sustech.gamercenter.model.GameDiscount;
 
 @RestController
 @RequestMapping("/game")
@@ -56,13 +56,14 @@ public class GameController {
         return ResultService.success(gameService.save(game));
     }
 
-    @RequestMapping(value = "/getPhoto/{url:[a-zA-Z0-9_.]+}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @GetMapping(value = "/getPhoto/{url:.+}", produces = MediaType.IMAGE_JPEG_VALUE)
+//    @GetMapping(value = "/getPhoto/{url:[a-zA-Z0-9_.%]+}", produces = MediaType.IMAGE_JPEG_VALUE)
     @ResponseBody
     public byte[] getPhoto(@PathVariable("url") String url) throws IOException {
         return gameService.getFile(url, "image");
     }
 
-    @RequestMapping("/download")
+    @GetMapping("/download")
     public Object fileDownLoad(HttpServletResponse response, @RequestParam("name") String fileName,
                                @RequestParam("type") String type) throws IOException {
         gameService.download(response, fileName, type);
@@ -76,8 +77,8 @@ public class GameController {
     }
 
     @GetMapping("/list")
-    public Object search(@RequestParam("tag") String tag, @RequestParam("name") String name, @RequestParam("page") int page){
-        return ResultService.success(gameService.search(tag, name,page));
+    public Object search(@RequestParam("tag") String tag, @RequestParam("name") String name, @RequestParam("page") int page) {
+        return ResultService.success(gameService.search(tag, name, page));
 //        return ResultService.success(gameService.search(tag, name));
     }
 

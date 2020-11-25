@@ -183,7 +183,9 @@ public class UserService {
                 .user(userRepository.getOne(id))
                 .friends(userRepository.userHasFriends(id))
                 .games(userRepository.userHasGames(id))
-                .messages(messageRepository.findAllByUserIdAndUnread(id, true))
+//                .messages(messageRepository.findAllByUserIdAndUnread(id, true))
+//                .messages(userRepository.userHasAllMessages(id))
+                .messages(userRepository.userHasUnreadMessages(id, true))
                 .build();
     }
 

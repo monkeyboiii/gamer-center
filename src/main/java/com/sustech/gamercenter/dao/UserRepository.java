@@ -2,7 +2,7 @@ package com.sustech.gamercenter.dao;
 
 import com.sustech.gamercenter.dao.projection.FriendView;
 import com.sustech.gamercenter.dao.projection.GameView;
-import com.sustech.gamercenter.model.Message;
+import com.sustech.gamercenter.dao.projection.MessageView;
 import com.sustech.gamercenter.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -34,6 +34,20 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "from game " +
             "where id in (select game_id from users_games where user_id = ?1)", nativeQuery = true)
     List<GameView> userHasGames(Long id);
+
+
+    @Query(value = "select u.name, um.message,um.created_at " +
+            "from users_messages um " +
+            "left join users u on um.source = u.id " +
+            "where user_id = ?1 and unread =?2 ", nativeQuery = true)
+    List<MessageView> userHasUnreadMessages(Long id, Boolean unread);
+
+
+    @Query(value = "select u.name, um.message,um.created_at " +
+            "from users_messages um " +
+            "left join users u on um.source = u.id " +
+            "where user_id = ?1 ", nativeQuery = true)
+    List<MessageView> userHasAllMessages(Long id);
 
 
     @Modifying
