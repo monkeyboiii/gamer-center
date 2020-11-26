@@ -3,7 +3,6 @@ package com.sustech.gamercenter.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -52,7 +51,7 @@ public class User implements Serializable {
 
     // can be used at register
     public User(String name, String email, String password, String role) {
-        this(name, email, password, role, 0.0, false, false, new Timestamp(System.currentTimeMillis()));
+        this(name, email, password, role, 0.0, "", "", false, false, new Timestamp(System.currentTimeMillis()));
     }
 
     // for test purposes
@@ -61,12 +60,14 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public User(String name, String email, String password, String role, Double balance, Boolean online, Boolean locked, Timestamp createdAt) {
+    public User(String name, String email, String password, String role, Double balance, String avatar, String bio, Boolean online, Boolean locked, Timestamp createdAt) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.balance = balance;
         this.role = role;
+        this.avatar = avatar;
+        this.bio = bio;
         this.online = online;
         this.locked = locked;
         this.createdAt = createdAt;

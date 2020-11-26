@@ -30,14 +30,14 @@ public class UserController {
     UserService userService;
 
 
-    @AuthToken
+    @AuthToken(role = "p")
     @GetMapping("/info")
     public JsonResponse getUserInfo(@RequestHeader("token") String token) throws InvalidTokenException {
         return new JsonResponse(0, "Success", userService.getUserInfo(token));
     }
 
 
-    @AuthToken
+    @AuthToken(role = "p")
     @GetMapping("/game")
     public JsonResponse userHasGames(@RequestHeader("token") String token,
                                      @RequestParam("tag") String tag,
@@ -48,7 +48,7 @@ public class UserController {
     }
 
 
-    @AuthToken
+    @AuthToken(role = "p")
     @GetMapping("/collection")
     public JsonResponse getCollection(@RequestHeader("token") String token) {
         // todo
@@ -57,7 +57,7 @@ public class UserController {
     }
 
 
-    @AuthToken
+    @AuthToken(role = "p")
     @GetMapping("/account/topup")
     public JsonResponse topUp(@RequestHeader("token") String token,
                               @RequestParam("amount") Double amount
@@ -67,7 +67,7 @@ public class UserController {
     }
 
 
-    @AuthToken
+    @AuthToken(role = "p")
     @PostMapping("/friend/request")
     public JsonResponse sendFriendRequest(@RequestHeader("token") String token,
                                           @RequestParam(value = "user_id", required = false) Long id,
@@ -86,7 +86,7 @@ public class UserController {
     }
 
 
-    @AuthToken
+    @AuthToken(role = "p")
     @PostMapping("/friend/confirm")
     public JsonResponse confirmFriendRequest(@RequestHeader("token") String token,
                                              @RequestParam("from") Long from) throws InvalidTokenException {
@@ -95,7 +95,7 @@ public class UserController {
     }
 
 
-    @AuthToken
+    @AuthToken(role = "p")
     @PostMapping("/message/read")
     public JsonResponse readMessage(@RequestHeader("token") String token,
                                     @RequestParam("id") Long id) throws InvalidTokenException {

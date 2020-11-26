@@ -8,6 +8,8 @@ import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
 import com.sustech.gamercenter.util.exception.*;
 import com.sustech.gamercenter.util.model.UserInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -104,8 +106,15 @@ public class UserService {
         File dir = new File(realPath);
         String filename = user.getId().toString() + ".jpg";
         File fileServer = new File(dir, filename);
-        avatar.transferTo(fileServer);
+
+        try {
+            avatar.transferTo(fileServer);
+        } catch (Exception e) {
+            logger.error(e.getClass().getName());
+        }
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
 
     //

@@ -1,10 +1,7 @@
 package com.sustech.gamercenter.util.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sustech.gamercenter.model.User;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -12,18 +9,14 @@ import java.util.List;
  */
 public class UserInfo extends User {
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date registeredAt;
-
     private List<?> friends;
     private List<?> games;
     private List<?> messages;
 
 
     public UserInfo(User user, List<?> friends, List<?> games, List<?> messages) {
-        super(user.getName(), user.getEmail(), null, user.getRole(), user.getBalance(), user.getOnline(), user.getLocked(), user.getCreatedAt());
+        super(user.getName(), user.getEmail(), null, user.getRole(), user.getBalance(), user.getAvatar(), user.getBio(), user.getOnline(), user.getLocked(), user.getCreatedAt());
         this.setId(user.getId());
-        this.registeredAt = new Date(user.getCreatedAt().getTime());
         this.friends = friends;
         this.games = games;
         this.messages = messages;
@@ -61,14 +54,6 @@ public class UserInfo extends User {
         public UserInfo build() {
             return new UserInfo(user, friends, games, messages);
         }
-    }
-
-    public Date getRegisteredAt() {
-        return registeredAt;
-    }
-
-    public void setRegisteredAt(Date registeredAt) {
-        this.registeredAt = registeredAt;
     }
 
     public List<?> getFriends() {
