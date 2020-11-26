@@ -1,6 +1,7 @@
 package com.sustech.gamercenter.controller;
 
 import com.sustech.gamercenter.security.AuthToken;
+import com.sustech.gamercenter.service.ResultService;
 import com.sustech.gamercenter.service.UserService;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
@@ -13,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-@Controller
+@RestController
 @RequestMapping("/api/user")
 public class AvatarController {
 
@@ -22,7 +23,6 @@ public class AvatarController {
 
 
     @GetMapping(value = "/avatar/{id:[0-9]+}", produces = MediaType.IMAGE_JPEG_VALUE)
-    @ResponseBody
     public byte[] getAvatar(@PathVariable("id") String id) throws IOException {
         return userService.getAvatar(id);
     }
@@ -30,11 +30,10 @@ public class AvatarController {
 
     @AuthToken
     @PostMapping("/edit/avatar")
-    @ResponseBody
-    public JsonResponse uploadAvatar(@RequestHeader("token") String token,
-                                     @RequestParam("avatar") MultipartFile avatar) throws UserNotFoundException, InvalidTokenException, IOException {
+    public Object uploadAvatar(@RequestHeader("token") String token,
+                               @RequestParam("avatar") MultipartFile avatar) throws UserNotFoundException, InvalidTokenException, IOException {
         userService.uploadAvatar(token, avatar);
-        return new JsonResponse(0, "Successfully uploaded");
+        return ResultService.success("");
     }
 
 }
