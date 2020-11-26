@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -89,6 +90,8 @@ public class UserService {
         String path = STORAGE_PREFIX + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
                 + "static" + File.separator + "user" + File.separator + "avatar" + File.separator + id + ".jpg";
         File file = new File(path);
+        if(!file.exists())
+            file = new File(path.replace(id, "default"));
         FileInputStream inputStream = new FileInputStream(file);
         byte[] bytes = new byte[inputStream.available()];
         inputStream.read(bytes, 0, inputStream.available());
@@ -96,15 +99,24 @@ public class UserService {
     }
 
     public void uploadAvatar(String token, MultipartFile avatar) throws InvalidTokenException, UserNotFoundException, IOException {
+//        User user = queryUserById(15734L);
         User user = queryUserById((tokenService.getIdByToken(token)));
 
         String path = File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
                 + "static" + File.separator + "user" + File.separator + "avatar";
         String realPath = STORAGE_PREFIX + path;
         File dir = new File(realPath);
+
         String filename = user.getId().toString() + ".jpg";
         File fileServer = new File(dir, filename);
-        avatar.transferTo(fileServer);
+//        System.out.println(fileServer.exists());
+//        System.out.println(fileServer.getAbsoluteFile().delete());
+        byte[] data = avatar.getBytes();
+        FileOutputStream fileOutputStream = new FileOutputStream(fileServer);
+        fileOutputStream.write(data);
+        fileOutputStream.flush();
+        fileOutputStream.close();
+        System.gc();
     }
 
 
