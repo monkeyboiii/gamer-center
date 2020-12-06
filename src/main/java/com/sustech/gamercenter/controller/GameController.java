@@ -2,7 +2,7 @@ package com.sustech.gamercenter.controller;
 
 import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.service.GameService;
-import com.sustech.gamercenter.service.ResultService;
+import com.sustech.gamercenter.util.model.ResultService;
 import com.sustech.gamercenter.util.exception.InsufficientBalanceException;
 import com.sustech.gamercenter.util.exception.MyException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;

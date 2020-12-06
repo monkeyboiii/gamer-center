@@ -2,7 +2,6 @@ package com.sustech.gamercenter.service;
 
 import com.sustech.gamercenter.dao.GameContentRepository;
 import com.sustech.gamercenter.dao.GameRepository;
-import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.model.GameContent;
 import com.sustech.gamercenter.util.exception.InsufficientBalanceException;
@@ -18,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 //import com.sustech.gamercenter.dao.GameDiscountRepository;
@@ -39,9 +37,6 @@ public class GameServiceImpl implements GameService {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
-
     private final static String STORAGE_PREFIX = System.getProperty("user.dir");
 
     @Override
@@ -55,15 +50,7 @@ public class GameServiceImpl implements GameService {
         }
 
         Long devId = game.getDeveloper_id();
-
-        // add audit record
-        userService.auditPurchase(userId, -price);
-        userService.auditPurchase(devId, price);
-
-        userService.transfer(price, userId, devId);
-        // if no throw, successfully purchased
-
-
+        userService.purchaseGame(userId, devId, gameId, price);
     }
 
 
@@ -164,10 +151,10 @@ public class GameServiceImpl implements GameService {
         SimpleDateFormat tempDate = new SimpleDateFormat("yyyy-MM-dd");
         String today = tempDate.format(new java.util.Date());
 
-        if (tag.equals("") && name.equals("")) games = gameRepository.findAllGame(today,pageable);
-        else if (tag.equals("")) games = gameRepository.findAllByNameLike(name, today,pageable);
-        else if (name.equals("")) games = gameRepository.findAllByTag(tag,today, pageable);
-        else games = gameRepository.findByTagOrNameLike(tag, name,today, pageable);
+        if (tag.equals("") && name.equals("")) games = gameRepository.findAllGame(today, pageable);
+        else if (tag.equals("")) games = gameRepository.findAllByNameLike(name, today, pageable);
+        else if (name.equals("")) games = gameRepository.findAllByTag(tag, today, pageable);
+        else games = gameRepository.findByTagOrNameLike(tag, name, today, pageable);
         return games;
 
     }

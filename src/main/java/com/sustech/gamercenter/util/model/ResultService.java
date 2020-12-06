@@ -1,4 +1,4 @@
-package com.sustech.gamercenter.service;
+package com.sustech.gamercenter.util.model;
 
 import java.util.HashMap;
 import java.util.Map;

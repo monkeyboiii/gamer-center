@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 public class Message {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long source = 0L;
 

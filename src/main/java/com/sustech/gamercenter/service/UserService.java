@@ -2,8 +2,10 @@ package com.sustech.gamercenter.service;
 
 
 import com.sustech.gamercenter.dao.MessageRepository;
+import com.sustech.gamercenter.dao.PaymentRepository;
 import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.dao.projection.GameView;
+import com.sustech.gamercenter.model.Payment;
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
 import com.sustech.gamercenter.util.exception.*;
@@ -11,13 +13,16 @@ import com.sustech.gamercenter.util.model.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService {
@@ -33,6 +38,12 @@ public class UserService {
 
     @Autowired
     MessageRepository messageRepository;
+
+    @Autowired
+    PaymentRepository paymentRepository;
+
+    @Autowired
+    MailService mailService;
 
 
     /**
@@ -79,9 +90,34 @@ public class UserService {
         }
     }
 
+    //    public void registerUserConfirm(String email,String confirmationCode){
+    //        // TODO add email confirmation, confirmationCode stores in redis
+    //    }
 
-    // TODO add email confirmation, confirmationCode stores in redis
-//    public void registerUserConfirm(String email,String confirmationCode){}
+    public Map<String, String> loginAuthentication(String email, String password, String role) throws UserNotFoundException, IncorrectPasswordException, UserHasNoRoleException {
+        User user = queryUserByEmail(email);
+        if (role.length() != 1 || !user.getRole().contains(role.toLowerCase())) {
+            throw new UserHasNoRoleException("User " + user.getName() + " has no such role");
+        } else if (encoder.matches(password, user.getPassword())) {
+            Map<String, String> map = new HashMap<>();
+            map.put("user_id", user.getId().toString());
+            map.put("token", tokenService.createToken(user));
+            return map;
+        } else {
+            throw new IncorrectPasswordException("Password incorrect");
+        }
+    }
+
+    public void logout(String token) throws UserHasNoTokenException, InvalidTokenException {
+        tokenService.deleteToken(token);
+    }
+
+
+    //
+    //
+    //
+    //
+    //
 
 
     private final static String STORAGE_PREFIX = System.getProperty("user.dir");
@@ -129,6 +165,21 @@ public class UserService {
     // login/token required
 
 
+    public void changeEmail(String token, String new_email) throws InvalidTokenException, UserNotFoundException, EmailNotSendException {
+        queryUserById((tokenService.getIdByToken(token)));
+        mailService.sendConfirmationCodeMail(new_email, 15);
+    }
+
+    public void changeEmailConfirm(String token, String new_email, String confirmation_code) throws InvalidTokenException, UserNotFoundException, InvalidConfirmationCodeException {
+        User user = queryUserById((tokenService.getIdByToken(token)));
+        if (tokenService.compareConfirmationCode(new_email, confirmation_code)) {
+            user.setEmail(new_email);
+            userRepository.flush();
+        } else {
+            throw new InvalidConfirmationCodeException("Confirmation code doesn't match");
+        }
+    }
+
     public void changePassword(String token, String old, String password) throws IncorrectPasswordException, InvalidTokenException, UserNotFoundException {
         User user = queryUserById((tokenService.getIdByToken(token)));
         if (encoder.matches(old, user.getPassword())) {
@@ -139,36 +190,17 @@ public class UserService {
         }
     }
 
-    public void changeEmail(String token, String email) throws InvalidTokenException, UserNotFoundException {
-        User user = queryUserById((tokenService.getIdByToken(token)));
-        user.setEmail(email);
-        userRepository.flush();
-    }
-
-    public void changeEmailConfirm(String token, String email, String confirmation_code) throws InvalidTokenException, UserNotFoundException {
-        User user = queryUserById((tokenService.getIdByToken(token)));
-        // TODO add email confirmation
-    }
-
     public void changeBio(String token, String bio) throws InvalidTokenException, UserNotFoundException {
         User user = queryUserById((tokenService.getIdByToken(token)));
         user.setBio(bio);
         userRepository.flush();
     }
 
-    public void topUp(String token, Double amount) throws InvalidTokenException, UserNotFoundException {
+    public Double changeBalance(String token, Double amount) throws InvalidTokenException, UserNotFoundException {
         User user = queryUserById((tokenService.getIdByToken(token)));
         user.setBalance(user.getBalance() + amount);
         userRepository.flush();
-    }
-
-    public void auditPurchase(Long id, Double amount) throws UserNotFoundException, InsufficientBalanceException {
-        User user = queryUserById(id);
-        if (user.getBalance() + amount < 0) {
-            throw new InsufficientBalanceException("User  " + user.getName() + " has no sufficient balance");
-        } else {
-            userRepository.auditPurchase(id, amount);
-        }
+        return user.getBalance();
     }
 
     public void transfer(Double amount, Long from, Long to) throws UserNotFoundException, InsufficientBalanceException {
@@ -208,6 +240,52 @@ public class UserService {
                 .build();
     }
 
+    public void purchaseGame(Long userId, Long devId, Long gameId, Double price) throws UserNotFoundException, InsufficientBalanceException {
+        // actual transferring
+        transfer(price, userId, devId);
+
+        User player = queryUserById(userId);
+        User dev = queryUserById(devId);
+        Payment payment = new Payment(userId, -price, player.getBalance());
+        Payment receive = new Payment(devId, price, dev.getBalance());
+
+        // add audit record
+        paymentRepository.save(payment);
+        paymentRepository.save(receive);
+
+        paymentRepository.receiveGame(userId, gameId, payment.getId());
+    }
+
+    public List<String> userHasGameTags(String token) throws InvalidTokenException {
+        return userRepository.userHasGameTags(tokenService.getIdByToken(token));
+    }
+
+    public List<GameView> userHasGamesWithTag(String token, String tag) throws InvalidTokenException {
+        Long id = tokenService.getIdByToken(token);
+        if (StringUtils.isEmpty(tag)) {
+            return userRepository.userHasGames(id);
+        } else {
+            return userRepository.userHasGamesWithTag(id, tag);
+        }
+    }
+
+
+    //
+    //
+    //
+    //
+    // message
+
+
+    public void sendChatTo(String token, Long to, String message) throws InvalidTokenException {
+        Long from = tokenService.getIdByToken(token);
+        userRepository.sendMessage(from, to, "chat", message);
+    }
+
+    public void readMessage(Long id) {
+        userRepository.readMessage(id);
+    }
+
     public void sendFriendRequest(String token, String value, String method) throws InvalidTokenException, UserNotFoundException {
         Long id = tokenService.getIdByToken(token);
         Long to_user_id;
@@ -228,22 +306,6 @@ public class UserService {
         Long confirm_id = tokenService.getIdByToken(token);
         userRepository.confirmFriendRequest(from, confirm_id);
         userRepository.sendMessage(confirm_id, from, "reply", "I've accepted your friend request");
-    }
-
-    public void readMessage(Long id) {
-        userRepository.readMessage(id);
-    }
-
-
-    //
-    //
-    //
-    //
-    //
-
-
-    public List<GameView> userHasGamesInTag(String token, String tag) throws InvalidTokenException {
-        return userRepository.userHasGamesWithTag(tokenService.getIdByToken(token), tag);
     }
 
 }

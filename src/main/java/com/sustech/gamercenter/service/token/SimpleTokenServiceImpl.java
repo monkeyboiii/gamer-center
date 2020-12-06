@@ -2,12 +2,9 @@ package com.sustech.gamercenter.service.token;
 
 import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.model.User;
-import com.sustech.gamercenter.util.deprecated.TokenServiceRedisImpl;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
 import com.sustech.gamercenter.util.exception.UserHasNoTokenException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -18,8 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class SimpleTokenServiceImpl implements SimpleTokenService {
-    // todo add more token service
-    private static final Logger logger = LoggerFactory.getLogger(TokenServiceRedisImpl.class);
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -35,14 +30,6 @@ public class SimpleTokenServiceImpl implements SimpleTokenService {
 
         redisTemplate.opsForValue().set(token, id, 24, TimeUnit.HOURS);
         redisTemplate.opsForValue().set(id, token, 24, TimeUnit.HOURS);
-
-        logger.warn(token);
-        logger.warn(id);
-
-//        redisTemplate.boundValueOps(token).set(id, 24, TimeUnit.HOURS);
-//        redisTemplate.boundValueOps(id).set(token, 24, TimeUnit.HOURS);
-
-//        userPool.add(String.valueOf(user.getId()), token);
 
         return token;
     }
@@ -92,7 +79,7 @@ public class SimpleTokenServiceImpl implements SimpleTokenService {
 
 
     @Override
-    public void deleteToken(String token) throws InvalidTokenException, UserHasNoTokenException {
+    public void deleteToken(String token) throws InvalidTokenException {
         Long id = getIdByToken(token);
         redisTemplate.delete(token);
         redisTemplate.delete(id.toString());
@@ -102,5 +89,18 @@ public class SimpleTokenServiceImpl implements SimpleTokenService {
     public void deleteToken(Long id) throws UserHasNoTokenException, InvalidTokenException {
         String token = getTokenById(id);
         deleteToken(token);
+    }
+
+
+    //
+    //
+
+    @Override
+    public void createConfirmationCode(String email, String code, Integer expire) {
+        redisTemplate.opsForValue().set(email, code, expire, TimeUnit.MINUTES);
+    }
+
+    public boolean compareConfirmationCode(String email, String code) {
+        return code.equals(redisTemplate.boundValueOps(email).get());
     }
 }

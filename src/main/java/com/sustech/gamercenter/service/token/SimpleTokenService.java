@@ -1,8 +1,8 @@
 package com.sustech.gamercenter.service.token;
 
 import com.sustech.gamercenter.model.User;
-import com.sustech.gamercenter.util.exception.UserHasNoTokenException;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
+import com.sustech.gamercenter.util.exception.UserHasNoTokenException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 
 public interface SimpleTokenService {
@@ -27,4 +27,11 @@ public interface SimpleTokenService {
     void deleteToken(String token) throws InvalidTokenException, UserHasNoTokenException;
 
     void deleteToken(Long id) throws UserHasNoTokenException, InvalidTokenException;
+
+    //
+    //
+
+    void createConfirmationCode(String email, String code, Integer expire);
+
+    boolean compareConfirmationCode(String email, String code);
 }

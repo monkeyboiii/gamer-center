@@ -3,7 +3,6 @@ package com.sustech.gamercenter.service;
 import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
-import com.sustech.gamercenter.util.exception.InvalidTokenException;
 import com.sustech.gamercenter.util.exception.UnauthorizedAttemptException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import com.sustech.gamercenter.util.exception.UserRegisterException;
@@ -93,15 +92,18 @@ public class AdminService {
         return bytes;
     }
 
-    public void uploadManual(MultipartFile manual) throws IOException {
+    public void uploadManual(String type, MultipartFile manual) throws IOException {
 //        if(manual.getContentType().contains("exe")){
 //
 //        }
         // todo check malicious content
+
         String path = File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
                 + "static" + File.separator + "admin" + File.separator + "manual";
         String realPath = STORAGE_PREFIX + path;
         File dir = new File(realPath);
+
+//        String filename = type + "_manual_" + manual.getOriginalFilename();
         String filename = "manual_" + manual.getOriginalFilename();
         File fileServer = new File(dir, filename);
         manual.transferTo(fileServer);

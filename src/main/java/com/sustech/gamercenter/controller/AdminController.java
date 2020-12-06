@@ -137,8 +137,9 @@ public class AdminController {
 
     //@AuthToken
     @PostMapping("/manual")
-    public JsonResponse uploadUserManual(@RequestParam("manual") MultipartFile manual) throws IOException {
-        adminService.uploadManual(manual);
+    public JsonResponse uploadUserManual(@RequestParam(value = "type", defaultValue = "user", required = false) String type,
+                                         @RequestParam("manual") MultipartFile manual) throws IOException {
+        adminService.uploadManual(type, manual);
         return new JsonResponse(0, "Success");
     }
 

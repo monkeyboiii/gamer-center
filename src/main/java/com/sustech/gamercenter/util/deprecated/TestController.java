@@ -3,9 +3,8 @@ package com.sustech.gamercenter.util.deprecated;
 import com.sustech.gamercenter.dao.MessageRepository;
 import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.service.AdminService;
+import com.sustech.gamercenter.service.MailService;
 import com.sustech.gamercenter.service.UserService;
-import com.sustech.gamercenter.util.exception.InvalidTokenException;
-import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +26,9 @@ public class TestController {
 
     @Autowired
     AdminService adminService;
+
+    @Autowired
+    MailService mailService;
 
     @GetMapping("/game")
     public Object userHasGames(@RequestParam("user_id") Long id) {
@@ -51,8 +53,14 @@ public class TestController {
 
     @PostMapping("/manual")
     public Object manual(@RequestParam("manual") MultipartFile manual) throws IOException {
-        adminService.uploadManual(manual);
+        adminService.uploadManual("user", manual);
         return "agf";
+    }
+
+    @PostMapping("/mail")
+    public Object mailTest() {
+        mailService.sendMail("11813010@mail.sustech.edu.cn", "hello", "spring boot says hello");
+        return "Send";
     }
 
 
