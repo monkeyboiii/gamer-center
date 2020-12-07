@@ -3,6 +3,7 @@ package com.sustech.gamercenter.service.token;
 import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
+import com.sustech.gamercenter.util.exception.UnauthorizedAttemptException;
 import com.sustech.gamercenter.util.exception.UserHasNoTokenException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,11 @@ public class SimpleTokenServiceImpl implements SimpleTokenService {
     public String createToken(User user) {
         String token = UUID.randomUUID().toString();
         String id = user.getId().toString();
+        String id_role = id + "_role";
 
         redisTemplate.opsForValue().set(token, id, 24, TimeUnit.HOURS);
         redisTemplate.opsForValue().set(id, token, 24, TimeUnit.HOURS);
+        redisTemplate.opsForValue().set(id_role, user.getRole(), 24, TimeUnit.HOURS);
 
         return token;
     }
@@ -52,6 +55,14 @@ public class SimpleTokenServiceImpl implements SimpleTokenService {
         Boolean result = redisTemplate.hasKey(token);
         if (result == null || result.equals(Boolean.FALSE)) {
             throw new InvalidTokenException("Invalid token " + token);
+        }
+    }
+
+    @Override
+    public void checkTokenRole(String token, String role) throws InvalidTokenException, UnauthorizedAttemptException {
+        String id_role = getIdByToken(token).toString() + "_role";
+        if (!Objects.equals(redisTemplate.boundValueOps(id_role).get(), role)) {
+            throw new UnauthorizedAttemptException("Your role has no authority");
         }
     }
 

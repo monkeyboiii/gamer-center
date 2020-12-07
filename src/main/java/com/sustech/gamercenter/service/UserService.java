@@ -7,9 +7,9 @@ import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.dao.projection.GameView;
 import com.sustech.gamercenter.model.Payment;
 import com.sustech.gamercenter.model.User;
+import com.sustech.gamercenter.model.UserInfo;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
 import com.sustech.gamercenter.util.exception.*;
-import com.sustech.gamercenter.util.model.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -277,9 +278,10 @@ public class UserService {
     // message
 
 
-    public void sendChatTo(String token, Long to, String message) throws InvalidTokenException {
+    public void sendMessageTo(String token, String to_name, String type, String message) throws InvalidTokenException, UserNotFoundException {
         Long from = tokenService.getIdByToken(token);
-        userRepository.sendMessage(from, to, "chat", message);
+        Long to = queryUserByName(to_name).getId();
+        userRepository.sendMessage(from, to, type, message);
     }
 
     public void readMessage(Long id) {
@@ -308,4 +310,17 @@ public class UserService {
         userRepository.sendMessage(confirm_id, from, "reply", "I've accepted your friend request");
     }
 
+
+    //
+    //
+    //
+    //
+    //
+
+    public String createOAuthToken(String token, Long game_id) throws InvalidTokenException {
+        Long user_id = tokenService.getIdByToken(token);
+        String uuid = UUID.randomUUID().toString();
+        userRepository.createOAuthToken(user_id, game_id, uuid);
+        return uuid;
+    }
 }

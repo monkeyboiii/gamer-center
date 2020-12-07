@@ -1,6 +1,4 @@
-package com.sustech.gamercenter.util.model;
-
-import com.sustech.gamercenter.model.User;
+package com.sustech.gamercenter.model;
 
 import java.util.List;
 

@@ -2,6 +2,7 @@ package com.sustech.gamercenter.service.token;
 
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
+import com.sustech.gamercenter.util.exception.UnauthorizedAttemptException;
 import com.sustech.gamercenter.util.exception.UserHasNoTokenException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 
@@ -15,6 +16,8 @@ public interface SimpleTokenService {
      * currently used by interceptor
      */
     void checkToken(String token) throws InvalidTokenException;
+
+    void checkTokenRole(String token, String role) throws InvalidTokenException, UnauthorizedAttemptException;
 
     //
 

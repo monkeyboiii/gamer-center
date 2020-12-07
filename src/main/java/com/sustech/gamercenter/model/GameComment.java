@@ -1,22 +1,24 @@
 package com.sustech.gamercenter.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@Table(name = "game_comment")
 public class GameComment {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long game_comment_id;
 
     private long user_id;
     private long game_id;
     private String content;
     private double grade;
+
+    @JsonIgnore
+    private boolean visible;
 
     public Long getGame_comment_id() {
         return game_comment_id;
@@ -58,6 +60,14 @@ public class GameComment {
         this.grade = grade;
     }
 
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
     public GameComment(Long game_comment_id, int user_id, int game_id, String content, double grade) {
         this.game_comment_id = game_comment_id;
         this.user_id = user_id;
@@ -76,5 +86,6 @@ public class GameComment {
         this.grade = grade;
     }
 
-    public GameComment(){}
+    public GameComment() {
+    }
 }

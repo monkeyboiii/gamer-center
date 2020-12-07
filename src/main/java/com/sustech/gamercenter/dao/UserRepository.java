@@ -103,4 +103,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "left join users u on um.source = u.id " +
             "where user_id = ?1 ", nativeQuery = true)
     List<MessageView> userHasAllMessages(Long id);
+
+
+    //
+    //
+    //
+    //
+    // oAuth
+
+    @Modifying
+    @Query(value = "insert into users_games_tokens " +
+            "(user_id, game_id, developer_id, token) " +
+            "values(?1, ?2, (select developer_id from game where id = ?2), ?3) ", nativeQuery = true)
+    @Transactional
+    String createOAuthToken(Long user_id, Long game_id, String token);
 }

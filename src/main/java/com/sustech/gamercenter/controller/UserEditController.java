@@ -33,7 +33,7 @@ public class UserEditController {
         return new JsonResponse(0, "Success");
     }
 
-    @AuthToken
+    @AuthToken(role = "p")
     @PostMapping("/password")
     public JsonResponse changePassword(@RequestHeader("token") String token,
                                        @RequestParam("old_password") String old_password,
@@ -53,9 +53,9 @@ public class UserEditController {
 
 
     @AuthToken(role = "p")
-    @PostMapping("/topup")
+    @PostMapping("/balance")
     public JsonResponse changeBalance(@RequestHeader("token") String token,
-                              @RequestParam("amount") Double amount
+                                      @RequestParam("amount") Double amount
     ) throws UserNotFoundException, InvalidTokenException {
         return new JsonResponse(0, "Successfully topped up", userService.changeBalance(token, amount));
     }

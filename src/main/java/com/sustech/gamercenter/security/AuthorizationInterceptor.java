@@ -2,9 +2,11 @@ package com.sustech.gamercenter.security;
 
 import com.sustech.gamercenter.service.token.SimpleTokenService;
 import com.sustech.gamercenter.util.exception.InvalidTokenException;
+import com.sustech.gamercenter.util.exception.UnauthorizedAttemptException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -32,21 +34,23 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws InvalidTokenException {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws InvalidTokenException, UnauthorizedAttemptException {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         Method method = handlerMethod.getMethod();
+        AuthToken auth = method.getAnnotation(AuthToken.class);
 
-
-        if (method.getAnnotation(AuthToken.class) != null || handlerMethod.getBeanType().getAnnotation(AuthToken.class) != null) {
+        if (auth != null || handlerMethod.getBeanType().getAnnotation(AuthToken.class) != null) {
             String token = request.getHeader(httpHeaderName);
             logger.info("Get token from request is {} ", token);
-            tokenService.checkToken(token); // pass or throws
 
-//            AuthToken authToken = method.getAnnotation(AuthToken.class);
-
+            if (StringUtils.isEmpty(auth.role())) {
+                tokenService.checkToken(token); // pass or throws
+            } else {
+                tokenService.checkTokenRole(token, auth.role()); // pass or throws
+            }
         }
 
         request.setAttribute(REQUEST_CURRENT_KEY, null);

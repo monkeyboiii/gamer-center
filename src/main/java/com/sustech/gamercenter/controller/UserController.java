@@ -27,7 +27,7 @@ import java.io.IOException;
  * for methods with {@link AuthToken} annotation:
  * login/token required.
  * intercepted by {@link AuthorizationInterceptor}
- * and processed with role role based authorization model
+ * and processed with role based authorization model
  **/
 @RestController
 @RequestMapping("/api/user")
@@ -39,7 +39,7 @@ public class UserController {
     UserService userService;
 
 
-    @AuthToken(role = "p")
+    @AuthToken()
     @GetMapping("/info")
     public JsonResponse getUserInfo(@RequestHeader("token") String token) throws InvalidTokenException {
         return new JsonResponse(0, "Success", userService.getUserInfo(token));
@@ -83,16 +83,16 @@ public class UserController {
     @AuthToken
     @PostMapping("/friend/chat")
     public JsonResponse sendMessageTo(@RequestHeader("token") String token,
+                                      @RequestParam(value = "type", defaultValue = "chat", required = false) String type,
                                       @RequestParam("message") String message,
-                                      @RequestParam("to") Long to) throws InvalidTokenException {
-        userService.sendChatTo(token, to, message);
+                                      @RequestParam("to") String to_name) throws InvalidTokenException, UserNotFoundException {
+        userService.sendMessageTo(token, to_name, type, message);
         return new JsonResponse(0, "Successfully sent");
     }
 
     @AuthToken(role = "p")
     @PostMapping("/message/read")
-    public JsonResponse readMessage(@RequestHeader("token") String token,
-                                    @RequestParam("id") Long id) throws InvalidTokenException {
+    public JsonResponse readMessage(@RequestParam("id") Long id) {
         userService.readMessage(id);
         return new JsonResponse(0, "Message marked as read");
     }
@@ -218,6 +218,19 @@ public class UserController {
                                         @RequestParam("confirm") String confirmationCode) {
         // confirmationCode in email
         return new JsonResponse(0, "No impl. Successfully registered");
+    }
+
+
+    //
+    //
+    //
+    //
+    // oauth
+
+    @PostMapping("/oauth")
+    public JsonResponse oAuth(@RequestHeader("token") String token,
+                              @RequestParam("game_id") Long game_id) throws InvalidTokenException {
+        return new JsonResponse(0, "Successfully created", userService.createOAuthToken(token, game_id));
     }
 
 }

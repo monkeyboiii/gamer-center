@@ -1,8 +1,8 @@
 package com.sustech.gamercenter.controller;
 
-import com.sustech.gamercenter.util.exception.MyException;
 import com.sustech.gamercenter.model.GameComment;
 import com.sustech.gamercenter.service.GameCommentService;
+import com.sustech.gamercenter.util.exception.MyException;
 import com.sustech.gamercenter.util.model.ResultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,31 +18,31 @@ public class GameCommentController {
     }
 
     @PostMapping
-    public Object addComment(@RequestBody GameComment gameComment){
-        if(gameCommentService.addComment(gameComment) == -1)
+    public Object addComment(@RequestBody GameComment gameComment) {
+        if (gameCommentService.addComment(gameComment) == -1)
             return new MyException(-1, "User has commented.");
         else
             return ResultService.success("");
     }
 
     @GetMapping
-    public Object getAllComment(){
+    public Object getAllComment() {
         return ResultService.success(gameCommentService.getAllComment());
     }
 
-    @DeleteMapping(path = "{id}")
-    public Object deleteComment(@PathVariable("id") long commentId){
+    @DeleteMapping
+    public Object deleteComment(@RequestParam("id") long commentId) {
         gameCommentService.deleteComment(commentId);
         return ResultService.success("");
     }
 
-    @GetMapping(path = "GID/{id}")
-    public Object getCommentByGame(@PathVariable("id") long GID){
+    @GetMapping("/GID")
+    public Object getCommentByGame(@RequestParam("id") long GID) {
         return ResultService.success(gameCommentService.getCommentByGame(GID));
     }
 
-    @GetMapping(path = "UID/{id}")
-    public Object getCommentByUser(@PathVariable("id") long UID){
+    @GetMapping("/UID")
+    public Object getCommentByUser(@RequestParam("id") long UID) {
         return ResultService.success(gameCommentService.getCommentByUser(UID));
     }
 }
