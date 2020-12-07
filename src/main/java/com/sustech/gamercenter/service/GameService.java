@@ -33,5 +33,10 @@ public interface GameService {
 
     Page<Game> search(String tag, String name, int page);
 
+    void cloudUpload(long gameId, long userId, MultipartFile uploadFile) throws IOException;
+
+    void cloudDownload(HttpServletResponse response, long gameId, long userId, String fileName) throws IOException;
+
+    void getCloudList(HttpServletResponse response, long gameId, long userId) throws IOException ;
 //    public Object findById(long id);
 }

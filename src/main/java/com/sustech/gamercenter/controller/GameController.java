@@ -47,6 +47,27 @@ public class GameController {
         return ResultService.success("");
     }
 
+    @PostMapping("/cloudUpload")
+    public Object cloudUpload(@RequestParam("game_id") long gameId, @RequestParam("user_id") long userId,
+                              @RequestParam("upload_file") MultipartFile uploadFile) throws IOException{
+        gameService.cloudUpload(gameId,userId,uploadFile);
+        return ResultService.success("");
+    }
+
+    @GetMapping("/cloudDownload")
+    public Object cloudDownload(HttpServletResponse response, @RequestParam("game_id") long gameId,
+                               @RequestParam("user_id") long userId, @RequestParam("name") String fileName)
+                                throws IOException {
+        gameService.cloudDownload(response, gameId, userId, fileName);
+        return ResultService.success("");
+    }
+
+    @GetMapping("/cloudList")
+    public Object cloudList(HttpServletResponse response, @RequestParam("game_id") long gameId, @RequestParam("user_id")
+                            long userId) throws IOException {
+        gameService.getCloudList(response, gameId, userId);
+        return ResultService.success("");
+    }
 
     @PostMapping("/update")
     public Object updateGame(Game game) {

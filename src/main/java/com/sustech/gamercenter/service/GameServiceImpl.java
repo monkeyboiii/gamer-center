@@ -78,6 +78,24 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    public void cloudUpload(long gameId, long userId, MultipartFile uploadFile) throws IOException {
+        String path = STORAGE_PREFIX + File.separator + "src" + File.separator + "main" + File.separator + "resources"
+                + File.separator + "static" + File.separator + "cloud" + File.separator + gameId;
+        File dir = new File(path);
+        if (!dir.exists() && !dir.isDirectory()){
+            dir.mkdir();
+        }
+        path = path + File.separator + userId;
+        dir = new File(path);
+        if (!dir.exists() && !dir.isDirectory()){
+            dir.mkdir();
+        }
+        String filename = uploadFile.getOriginalFilename();
+        File fileServer = new File(dir, filename);
+        uploadFile.transferTo(fileServer);
+    }
+
+    @Override
     public byte[] getFile(String url, String type) throws IOException {
         File file = new File(STORAGE_PREFIX + File.separator + "src" + File.separator + "main" + File.separator
                 + "resources" + File.separator + "static" + File.separator + "game" + File.separator + type + File.separator + url);
@@ -109,11 +127,7 @@ public class GameServiceImpl implements GameService {
         return gameRepository.findById(id);
     }
 
-    @Override
-    public void download(HttpServletResponse response, String fileName, String type) throws IOException {
-        File file = new File(STORAGE_PREFIX + File.separator + "src" + File.separator + "main" + File.separator
-                + "resources" + File.separator + "static" + File.separator + "game" + File.separator + type + File.separator + fileName);
-
+    public void getFile(HttpServletResponse response, File file, String fileName) {
         if (!file.exists()) {
             throw new MyException(-1, "File doesn't exist.");
         }
@@ -123,7 +137,7 @@ public class GameServiceImpl implements GameService {
         response.setContentLength((int) file.length());
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 
-        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));) {
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
             byte[] buff = new byte[1024];
             OutputStream os = response.getOutputStream();
             int i = 0;
@@ -134,6 +148,51 @@ public class GameServiceImpl implements GameService {
         } catch (IOException e) {
             throw new MyException(-1, "Download fail.");
         }
+    }
+
+    @Override
+    public void download(HttpServletResponse response, String fileName, String type) throws IOException {
+        File file = new File(STORAGE_PREFIX + File.separator + "src" + File.separator + "main" + File.separator
+                + "resources" + File.separator + "static" + File.separator + "game" + File.separator + type + File.separator + fileName);
+        getFile(response, file, fileName);
+    }
+
+    @Override
+    public void cloudDownload(HttpServletResponse response, long gameId, long userId, String fileName) throws IOException {
+        String path = STORAGE_PREFIX + File.separator + "src" + File.separator + "main" + File.separator
+                + "resources" + File.separator + "static" + File.separator + "cloud" + File.separator + gameId
+                + File.separator + userId + File.separator + fileName;
+
+        File file = new File(path);
+
+        getFile(response, file, fileName);
+    }
+
+    @Override
+    public void getCloudList(HttpServletResponse response, long gameId, long userId) throws IOException {
+        String path = STORAGE_PREFIX + File.separator + "src" + File.separator + "main" + File.separator
+                + "resources" + File.separator + "static" + File.separator + "cloud" + File.separator + gameId
+                + File.separator;
+        String txtPath = path + "tmp.txt";
+        path = path  + userId;
+        File file = new File(txtPath);
+        if (file.exists()){
+            file.delete();
+        }
+        file.createNewFile();
+
+        file = new File(path);
+        FileWriter fileWriter = new FileWriter(txtPath);
+        if (file.exists()){
+            String[] filelist = file.list();
+            for (int i = 0; i < filelist.length; i++) {
+                fileWriter.write(filelist[i] + "\r\n");
+            }
+        }
+        fileWriter.flush();
+        fileWriter.close();
+        file = new File(txtPath);
+        getFile(response, file, userId + ".txt");
     }
 
     @Override
