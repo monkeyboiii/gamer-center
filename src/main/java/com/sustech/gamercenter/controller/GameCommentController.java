@@ -2,6 +2,8 @@ package com.sustech.gamercenter.controller;
 
 import com.sustech.gamercenter.model.GameComment;
 import com.sustech.gamercenter.service.GameCommentService;
+import com.sustech.gamercenter.util.exception.DuplicateCommentException;
+import com.sustech.gamercenter.util.exception.InvalidTokenException;
 import com.sustech.gamercenter.util.exception.MyException;
 import com.sustech.gamercenter.util.model.ResultService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,7 @@ public class GameCommentController {
     }
 
     @PostMapping
-    public Object addComment(@RequestBody GameComment gameComment) {
+    public Object addComment(@RequestBody GameComment gameComment) throws DuplicateCommentException {
         if (gameCommentService.addComment(gameComment) == -1)
             return new MyException(-1, "User has commented.");
         else
@@ -42,7 +44,7 @@ public class GameCommentController {
     }
 
     @GetMapping("/UID")
-    public Object getCommentByUser(@RequestParam("id") long UID) {
-        return ResultService.success(gameCommentService.getCommentByUser(UID));
+    public Object getCommentByUser(@RequestHeader("token") String token) throws InvalidTokenException {
+        return ResultService.success(gameCommentService.getCommentByUser(token));
     }
 }

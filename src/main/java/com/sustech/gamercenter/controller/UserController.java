@@ -7,14 +7,13 @@ import com.sustech.gamercenter.service.UserService;
 import com.sustech.gamercenter.util.exception.*;
 import com.sustech.gamercenter.util.model.JsonResponse;
 import com.sustech.gamercenter.util.model.ResultService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 
@@ -32,8 +31,6 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
-
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     UserService userService;
@@ -65,11 +62,32 @@ public class UserController {
 
 
     @AuthToken(role = "p")
+    @PostMapping("/collection/upload")
+    public JsonResponse uploadCollection(@RequestHeader("token") String token,
+                                         @RequestParam(value = "name", defaultValue = "", required = false) String name,
+                                         @RequestParam("type") String type,
+                                         @RequestParam("collection") MultipartFile file) throws UploadFileException, InvalidTokenException {
+        userService.uploadCollection(token, name, type, file);
+        return new JsonResponse(0, "Successfully uploaded");
+    }
+
+
+    @AuthToken(role = "p")
     @GetMapping("/collection")
-    public JsonResponse getCollection(@RequestHeader("token") String token) {
-        // todo
-        logger.info("token received: " + token);
-        return new JsonResponse(0, "Successfully retrieved");
+    public JsonResponse getCollection(@RequestHeader("token") String token,
+                                      @RequestParam(value = "type", defaultValue = "", required = false) String type) throws InvalidTokenException {
+        System.out.println(userService.getCollection(token, type).size());
+        return new JsonResponse(0, "Successfully retrieved", userService.getCollection(token, type));
+    }
+
+
+    @GetMapping(value = "/collection/download/**", produces =
+            {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_PNG_VALUE})
+    public byte[] moduleStrings(HttpServletRequest request) throws IOException {
+//    public byte[] downloadCollection(@RequestParam("path") String path) throws IOException {
+        String requestURL = request.getRequestURL().toString();
+        String path = requestURL.split("/collection/download/")[1];
+        return userService.downloadCollection(path);
     }
 
 
@@ -138,7 +156,7 @@ public class UserController {
             @RequestParam("email") String email,
             @RequestParam("password") String password,
             @RequestParam(value = "role", required = false, defaultValue = "p") String role
-    ) throws UserNotFoundException, IncorrectPasswordException, UserHasNoRoleException {
+    ) throws UserNotFoundException, IncorrectPasswordException, UserHasNoRoleException, UserAccountLockedException {
         return new JsonResponse.builder()
                 .code(0)
                 .msg("Successfully logged in")
@@ -159,21 +177,14 @@ public class UserController {
     //
     //
     //
-    // avatar
+    // oauth
 
 
-    @GetMapping(value = "/avatar/{id:[0-9]+}", produces = MediaType.IMAGE_JPEG_VALUE)
-    public byte[] getAvatar(@PathVariable("id") String id) throws IOException {
-        return userService.getAvatar(id);
-    }
-
-
-    @AuthToken
-    @PostMapping("/edit/avatar")
-    public Object uploadAvatar(@RequestHeader("token") String token,
-                               @RequestParam("avatar") MultipartFile avatar) throws UserNotFoundException, InvalidTokenException, IOException {
-        userService.uploadAvatar(token, avatar);
-        return ResultService.success("");
+    @AuthToken(role = "p")
+    @PostMapping("/oauth")
+    public JsonResponse oAuth(@RequestHeader("token") String token,
+                              @RequestParam("game_id") Long game_id) throws InvalidTokenException {
+        return new JsonResponse(0, "Successfully created", userService.createOAuthToken(token, game_id));
     }
 
 
@@ -207,17 +218,24 @@ public class UserController {
                                  @RequestParam("email") String email,
                                  @RequestParam("password") String password,
                                  @RequestParam(value = "role", defaultValue = "p", required = false) String role
-    ) throws UserRegisterException, UnauthorizedAttemptException {
+    ) throws UserRegisterException, UnauthorizedAttemptException, EmailNotSendException {
         userService.registerUser(name, email, password, role);
-        return new JsonResponse(0, "Successful registered");
+        return new JsonResponse(0, "Confirmation code sent");
     }
 
 
     @PostMapping("/register/confirm")
-    public JsonResponse registerConfirm(@RequestParam("email") String enail,
-                                        @RequestParam("confirm") String confirmationCode) {
-        // confirmationCode in email
-        return new JsonResponse(0, "No impl. Successfully registered");
+    public JsonResponse registerConfirm(@RequestParam("email") String email,
+                                        @RequestParam("confirm") String confirmationCode) throws InvalidConfirmationCodeException, UserNotFoundException {
+        userService.registerUserConfirm(email, confirmationCode);
+        return new JsonResponse(0, "Successfully registered");
+    }
+
+
+    @PostMapping("/register/resend")
+    public JsonResponse resendRegisterConfirm(@RequestParam("email") String email) throws UserNotFoundException, EmailNotSendException {
+        userService.resendRegisterConfirm(email);
+        return new JsonResponse(0, "Confirmation code resent");
     }
 
 
@@ -225,12 +243,75 @@ public class UserController {
     //
     //
     //
-    // oauth
+    // edit
 
-    @PostMapping("/oauth")
-    public JsonResponse oAuth(@RequestHeader("token") String token,
-                              @RequestParam("game_id") Long game_id) throws InvalidTokenException {
-        return new JsonResponse(0, "Successfully created", userService.createOAuthToken(token, game_id));
+
+    @AuthToken(role = "p")
+    @PostMapping("/edit/email")
+    public JsonResponse changeEmail(@RequestHeader("token") String token,
+                                    @RequestParam("email") String email) throws InvalidTokenException, UserNotFoundException, EmailNotSendException {
+        userService.changeEmail(token, email);
+        return new JsonResponse(0, "Confirmation code sent");
     }
+
+
+    @AuthToken(role = "p")
+    @PostMapping("/edit/email/confirm")
+    public JsonResponse changeEmailConfirm(@RequestHeader("token") String token,
+                                           @RequestParam("email") String email,
+                                           @RequestParam("confirm") String confirmation_code) throws InvalidTokenException, UserNotFoundException, InvalidConfirmationCodeException {
+        userService.changeEmailConfirm(token, email, confirmation_code);
+        return new JsonResponse(0, "Successfully changed");
+    }
+
+    @AuthToken(role = "p")
+    @PostMapping("/edit/password")
+    public JsonResponse changePassword(@RequestHeader("token") String token,
+                                       @RequestParam("old_password") String old_password,
+                                       @RequestParam("new_password") String new_password) throws InvalidTokenException, UserNotFoundException, IncorrectPasswordException {
+        userService.changePassword(token, old_password, new_password);
+        return new JsonResponse(0, "Success");
+    }
+
+
+    @AuthToken(role = "p")
+    @PostMapping("/edit/bio")
+    public JsonResponse changeBio(@RequestHeader("token") String token,
+                                  @RequestParam("bio") String bio) throws UserNotFoundException, InvalidTokenException {
+        userService.changeBio(token, bio);
+        return new JsonResponse(0, "Success");
+    }
+
+
+    @AuthToken(role = "p")
+    @PostMapping("/edit/balance")
+    public JsonResponse changeBalance(@RequestHeader("token") String token,
+                                      @RequestParam("amount") Double amount
+    ) throws UserNotFoundException, InvalidTokenException {
+        return new JsonResponse(0, "Successfully topped up", userService.changeBalance(token, amount));
+    }
+
+
+    //
+    //
+    //
+    //
+    // avatar
+
+
+    @GetMapping(value = "/avatar/{id:[0-9]+}", produces = MediaType.IMAGE_JPEG_VALUE)
+    public byte[] getAvatar(@PathVariable("id") String id) throws IOException {
+        return userService.getAvatar(id);
+    }
+
+
+    @AuthToken
+    @PostMapping("/edit/avatar")
+    public Object uploadAvatar(@RequestHeader("token") String token,
+                               @RequestParam("avatar") MultipartFile avatar) throws UserNotFoundException, InvalidTokenException, IOException {
+        userService.uploadAvatar(token, avatar);
+        return ResultService.success("");
+    }
+
 
 }

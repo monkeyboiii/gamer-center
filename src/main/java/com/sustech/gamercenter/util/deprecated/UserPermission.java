@@ -1,4 +1,4 @@
-package com.sustech.gamercenter.security;
+package com.sustech.gamercenter.util.deprecated;
 
 public enum UserPermission {
 

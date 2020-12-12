@@ -14,6 +14,12 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * saves
+ * login id-token pair, login role,
+ * mail confirmation code
+ * in memory database redis
+ */
 @Service
 public class SimpleTokenServiceImpl implements SimpleTokenService {
 
@@ -25,22 +31,23 @@ public class SimpleTokenServiceImpl implements SimpleTokenService {
 
 
     @Override
-    public String createToken(User user) {
+    public String createToken(User user, String role) {
         String token = UUID.randomUUID().toString();
         String id = user.getId().toString();
         String id_role = id + "_role";
 
-        redisTemplate.opsForValue().set(token, id, 24, TimeUnit.HOURS);
-        redisTemplate.opsForValue().set(id, token, 24, TimeUnit.HOURS);
-        redisTemplate.opsForValue().set(id_role, user.getRole(), 24, TimeUnit.HOURS);
+        int expire = 24;
+        redisTemplate.opsForValue().set(token, id, expire, TimeUnit.HOURS);
+        redisTemplate.opsForValue().set(id, token, expire, TimeUnit.HOURS);
+        redisTemplate.opsForValue().set(id_role, role, expire, TimeUnit.HOURS);
 
         return token;
     }
 
     @Override
-    public String createTokenFromId(Long id) throws UserNotFoundException {
+    public String createTokenFromId(Long id, String role) throws UserNotFoundException {
         try {
-            return createToken(userRepository.getOne(id));
+            return createToken(userRepository.getOne(id), role);
         } catch (Exception e) {
             throw new UserNotFoundException("User with id " + id + " not found", e);
         }
@@ -60,11 +67,13 @@ public class SimpleTokenServiceImpl implements SimpleTokenService {
 
     @Override
     public void checkTokenRole(String token, String role) throws InvalidTokenException, UnauthorizedAttemptException {
-        String id_role = getIdByToken(token).toString() + "_role";
-        if (!Objects.equals(redisTemplate.boundValueOps(id_role).get(), role)) {
+        Long id = getIdByToken(token);
+        String loggedInAs = redisTemplate.boundValueOps(id.toString() + "_role").get();
+        if (!role.equals(loggedInAs)) {
             throw new UnauthorizedAttemptException("Your role has no authority");
         }
     }
+
 
     //
 
@@ -94,6 +103,7 @@ public class SimpleTokenServiceImpl implements SimpleTokenService {
         Long id = getIdByToken(token);
         redisTemplate.delete(token);
         redisTemplate.delete(id.toString());
+        redisTemplate.delete("id_role");
     }
 
     @Override
@@ -104,7 +114,8 @@ public class SimpleTokenServiceImpl implements SimpleTokenService {
 
 
     //
-    //
+    // mail confirmation
+
 
     @Override
     public void createConfirmationCode(String email, String code, Integer expire) {

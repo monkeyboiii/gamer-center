@@ -3,6 +3,7 @@ package com.sustech.gamercenter.dao;
 import com.sustech.gamercenter.dao.projection.FriendView;
 import com.sustech.gamercenter.dao.projection.GameView;
 import com.sustech.gamercenter.dao.projection.MessageView;
+import com.sustech.gamercenter.dao.projection.UserView;
 import com.sustech.gamercenter.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -54,6 +55,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "from users_games " +
             "where user_id = ?1", nativeQuery = true)
     List<String> userHasGameTags(Long id);
+
+
+    @Query(value = "select * " +
+            "from users " +
+            "where id in " +
+            "(select user_id from users_games " +
+            "where game_id = " +
+            "(select id " +
+            "from game " +
+            "where id = ?2 " +
+            "and developer_id = ?1)) ", nativeQuery = true)
+    List<UserView> getPlayerToGame(Long dev, Long game_id);
 
 
     //
@@ -111,10 +124,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
     //
     // oAuth
 
+
     @Modifying
     @Query(value = "insert into users_games_tokens " +
             "(user_id, game_id, developer_id, token) " +
             "values(?1, ?2, (select developer_id from game where id = ?2), ?3) ", nativeQuery = true)
     @Transactional
-    String createOAuthToken(Long user_id, Long game_id, String token);
+    void createOAuthToken(Long user_id, Long game_id, String token);
+
+
+    @Query(value = "SELECT " +
+            "EXISTS " +
+            "(SELECT * FROM users_games_tokens WHERE token = ?1) ", nativeQuery = true)
+    int validateOAuthToken(String oAuthToken);
+
 }

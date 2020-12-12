@@ -1,15 +1,15 @@
 package com.sustech.gamercenter.service;
 
 
-import com.sustech.gamercenter.dao.MessageRepository;
-import com.sustech.gamercenter.dao.PaymentRepository;
-import com.sustech.gamercenter.dao.UserRepository;
+import com.sustech.gamercenter.dao.*;
 import com.sustech.gamercenter.dao.projection.GameView;
 import com.sustech.gamercenter.model.Payment;
 import com.sustech.gamercenter.model.User;
+import com.sustech.gamercenter.model.UserCollection;
 import com.sustech.gamercenter.model.UserInfo;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
 import com.sustech.gamercenter.util.exception.*;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,10 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -36,6 +33,12 @@ public class UserService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    UserCollectionRepository userCollectionRepository;
+
+    @Autowired
+    GameRepository gameRepository;
 
     @Autowired
     MessageRepository messageRepository;
@@ -75,34 +78,50 @@ public class UserService {
                         new UserNotFoundException("User with email " + email + " doesn't exist"));
     }
 
-    public void registerUser(String name, String email, String password, String role) throws UserRegisterException, UnauthorizedAttemptException {
+    public void registerUser(String name, String email, String password, String role) throws UserRegisterException, UnauthorizedAttemptException, EmailNotSendException {
         if (role.contains("a") || role.contains("t")) {
             throw new UnauthorizedAttemptException("Cannot register admin/tester account");
         } else if (!role.equals("p") && !role.equals("d") && !role.equals("pd") && !role.equals("dp")) {
             throw new UserRegisterException("Invalid role selection");
         }
 
+        mailService.sendConfirmationCodeMail(email, 15);
+
         try {
             password = encoder.encode(password);
             User user = new User(name, email, password, role.toLowerCase());
+            user.setLocked(true);
             userRepository.save(user);
         } catch (Exception e) {
             throw new UserRegisterException("Username/email already exists", e);
         }
     }
 
-    //    public void registerUserConfirm(String email,String confirmationCode){
-    //        // TODO add email confirmation, confirmationCode stores in redis
-    //    }
+    public void registerUserConfirm(String email, String confirmationCode) throws UserNotFoundException, InvalidConfirmationCodeException {
+        User user = queryUserByEmail(email);
+        if (tokenService.compareConfirmationCode(email, confirmationCode)) {
+            user.setLocked(false);
+            userRepository.flush();
+        } else {
+            throw new InvalidConfirmationCodeException("Confirmation code doesn't match");
+        }
+    }
 
-    public Map<String, String> loginAuthentication(String email, String password, String role) throws UserNotFoundException, IncorrectPasswordException, UserHasNoRoleException {
+    public void resendRegisterConfirm(String email) throws UserNotFoundException, EmailNotSendException {
+        queryUserByEmail(email);
+        mailService.sendConfirmationCodeMail(email, 15);
+    }
+
+    public Map<String, String> loginAuthentication(String email, String password, String role) throws UserNotFoundException, IncorrectPasswordException, UserHasNoRoleException, UserAccountLockedException {
         User user = queryUserByEmail(email);
         if (role.length() != 1 || !user.getRole().contains(role.toLowerCase())) {
             throw new UserHasNoRoleException("User " + user.getName() + " has no such role");
+        } else if (user.getLocked()) {
+            throw new UserAccountLockedException("User " + user.getName() + "'s account is locked");
         } else if (encoder.matches(password, user.getPassword())) {
             Map<String, String> map = new HashMap<>();
             map.put("user_id", user.getId().toString());
-            map.put("token", tokenService.createToken(user));
+            map.put("token", tokenService.createToken(user, role.toLowerCase()));
             return map;
         } else {
             throw new IncorrectPasswordException("Password incorrect");
@@ -118,37 +137,32 @@ public class UserService {
     //
     //
     //
-    //
+    // avatar, collection, file related
 
 
     private final static String STORAGE_PREFIX = System.getProperty("user.dir");
 
+    private final static String RES_USER = STORAGE_PREFIX + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static" + File.separator + "user";
+
+    private final static String COLLECTION = RES_USER + File.separator + "collection";
+
+    private final static String AVATAR = RES_USER + File.separator + "avatar";
+
     public byte[] getAvatar(String id) throws IOException {
-        String path = STORAGE_PREFIX + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
-                + "static" + File.separator + "user" + File.separator + "avatar" + File.separator + id + ".jpg";
+        String path = AVATAR + File.separator + id + ".jpg";
         File file = new File(path);
         if (!file.exists())
             file = new File(path.replace(id, "default"));
         FileInputStream inputStream = new FileInputStream(file);
-        byte[] bytes = new byte[inputStream.available()];
-        inputStream.read(bytes, 0, inputStream.available());
-        return bytes;
+        return IOUtils.toByteArray(inputStream);
     }
 
     public void uploadAvatar(String token, MultipartFile avatar) throws InvalidTokenException, UserNotFoundException, IOException {
-//        User user = queryUserById(15734L);
         User user = queryUserById((tokenService.getIdByToken(token)));
-
-        String path = File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
-                + "static" + File.separator + "user" + File.separator + "avatar";
-        String realPath = STORAGE_PREFIX + path;
-        File dir = new File(realPath);
+        File dir = new File(AVATAR);
 
         String filename = user.getId().toString() + ".jpg";
         File fileServer = new File(dir, filename);
-
-//        System.out.println(fileServer.exists());
-//        System.out.println(fileServer.getAbsoluteFile().delete());
 
         byte[] data = avatar.getBytes();
         FileOutputStream fileOutputStream = new FileOutputStream(fileServer);
@@ -156,6 +170,46 @@ public class UserService {
         fileOutputStream.flush();
         fileOutputStream.close();
         System.gc();
+    }
+
+    public void uploadCollection(String token, String name, String type, MultipartFile file) throws InvalidTokenException, UploadFileException {
+        Long id = tokenService.getIdByToken(token);
+
+        name = StringUtils.isEmpty(name) ? (new Random().ints(97, 122 + 1)
+                .limit(10)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString()) : name;
+
+        File dir = new File(COLLECTION + File.separator + id.toString());
+        if (!dir.exists()) dir.mkdir();
+
+        try {
+            String path = File.separator + id.toString()
+                    + File.separator + name + "." + file.getOriginalFilename().split("\\.")[1];
+            File save = new File(COLLECTION + path);
+            save.createNewFile();
+            file.transferTo(save);
+
+            UserCollection u = new UserCollection(id, name, type, path);
+            userCollectionRepository.save(u);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new UploadFileException("Failed to upload collection");
+        }
+    }
+
+    public List<UserCollection> getCollection(String token, String type) throws InvalidTokenException {
+        Long userId = tokenService.getIdByToken(token);
+        if (StringUtils.isEmpty(type)) {
+            return userCollectionRepository.findAllByUserId(userId);
+        } else {
+            return userCollectionRepository.findAllByUserIdAndType(userId, type);
+        }
+    }
+
+    public byte[] downloadCollection(String path) throws IOException {
+        FileInputStream inputStream = new FileInputStream(COLLECTION + File.separator + path);
+        return IOUtils.toByteArray(inputStream);
     }
 
 
@@ -171,9 +225,9 @@ public class UserService {
         mailService.sendConfirmationCodeMail(new_email, 15);
     }
 
-    public void changeEmailConfirm(String token, String new_email, String confirmation_code) throws InvalidTokenException, UserNotFoundException, InvalidConfirmationCodeException {
+    public void changeEmailConfirm(String token, String new_email, String confirmationCode) throws InvalidTokenException, UserNotFoundException, InvalidConfirmationCodeException {
         User user = queryUserById((tokenService.getIdByToken(token)));
-        if (tokenService.compareConfirmationCode(new_email, confirmation_code)) {
+        if (tokenService.compareConfirmationCode(new_email, confirmationCode)) {
             user.setEmail(new_email);
             userRepository.flush();
         } else {
@@ -281,6 +335,12 @@ public class UserService {
     public void sendMessageTo(String token, String to_name, String type, String message) throws InvalidTokenException, UserNotFoundException {
         Long from = tokenService.getIdByToken(token);
         Long to = queryUserByName(to_name).getId();
+
+        if (type.equals("invitation")) {
+            String gameName = gameRepository.getOne(Long.valueOf(message)).getName();
+            message = "Let's play " + gameName + " together!";
+        }
+
         userRepository.sendMessage(from, to, type, message);
     }
 
@@ -315,7 +375,8 @@ public class UserService {
     //
     //
     //
-    //
+    // OAuth
+
 
     public String createOAuthToken(String token, Long game_id) throws InvalidTokenException {
         Long user_id = tokenService.getIdByToken(token);

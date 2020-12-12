@@ -26,8 +26,9 @@ public interface GameCommentRepository extends JpaRepository<GameComment, Long> 
 
     @Transactional
     @Modifying
-    @Query(value = "update game_comment set visible = False where game_comment_id = :game_comment_id", nativeQuery = true)
+    @Query(value = "update game_comment set visible = False where id = :game_comment_id", nativeQuery = true)
     int deleteComment(long game_comment_id);
+
 
     @Transactional
     @Modifying

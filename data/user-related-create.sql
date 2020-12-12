@@ -19,12 +19,13 @@ create table game
 
 create table game_comment
 (
-    game_comment_id bigint       not null
+    game_comment_id bigint           not null
         primary key,
-    content         varchar(255) null,
-    game_id         bigint       not null,
-    grade           double       not null,
-    user_id         bigint       not null
+    content         varchar(255)     null,
+    game_id         bigint           not null,
+    grade           double           not null,
+    user_id         bigint           not null,
+    visible         bit default b'1' null
 );
 
 create table game_content
@@ -53,6 +54,11 @@ create table hibernate_sequence
 (
     next_val bigint null
 );
+
+
+-- ----------------------------------------
+-- ----------------------------------------
+
 
 create table users
 (
@@ -93,7 +99,7 @@ create index idx_users_friends_users1
 create index idx_users_friends_users2
     on users_friends (to_user_id);
 
-create table users_games_token
+create table users_games_tokens
 (
     id           bigint auto_increment,
     user_id      bigint       not null,
@@ -135,7 +141,7 @@ alter table users_messages
 
 create table users_purchases
 (
-    id             bigint auto_increment,
+    id             bigint auto_increment primary key,
     user_id        bigint                              not null,
     balance_change decimal(9, 2)                       null,
     created_at     timestamp default CURRENT_TIMESTAMP null,
@@ -146,9 +152,6 @@ create table users_purchases
 
 create index idx_users_purchases
     on users_purchases (user_id);
-
-alter table users_purchases
-    add primary key (id);
 
 create table users_games
 (
@@ -174,4 +177,3 @@ create index fk_users_games_user_history1_idx
 
 create index fk_users_games_users1_idx
     on users_games (user_id);
-

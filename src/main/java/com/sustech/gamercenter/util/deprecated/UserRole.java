@@ -1,4 +1,4 @@
-package com.sustech.gamercenter.security;
+package com.sustech.gamercenter.util.deprecated;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static com.sustech.gamercenter.security.UserPermission.*;
+import static com.sustech.gamercenter.util.deprecated.UserPermission.*;
 
 public enum UserRole {
     Admin(newHashSet(

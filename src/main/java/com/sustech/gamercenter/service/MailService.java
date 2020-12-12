@@ -24,15 +24,20 @@ public class MailService {
     private String from;
 
 
-    public void sendMail(String to, String subject, String text) {
+    public void sendMail(String email, String subject, String text) throws EmailNotSendException {
         SimpleMailMessage message = new SimpleMailMessage();
 
         message.setFrom(from);
-        message.setTo(to);
+        message.setTo(email);
         message.setSubject(subject);
         message.setText(text);
-        javaMailSender.send(message);
+        try {
+            javaMailSender.send(message);
+        } catch (Exception e) {
+            throw new EmailNotSendException("Email to " + email + " was not send");
+        }
     }
+
 
     public void sendConfirmationCodeMail(String email, Integer expire) throws EmailNotSendException {
         String code = String.valueOf((int) (100000 + Math.random() * 900000));
@@ -40,11 +45,12 @@ public class MailService {
         message.setFrom(from);
         message.setTo(email);
         message.setSubject("Confirmation code");
-        message.setText("Your confirmation code is "
-                + code
-                + ". Will expire in "
-                + expire.toString()
-                + " minutes");
+        message.setText("Your confirmation code is " +
+                code +
+                ". Will expire in " +
+                expire +
+                " minutes.");
+
         try {
             javaMailSender.send(message);
             simpleTokenService.createConfirmationCode(email, code, expire);
@@ -53,15 +59,17 @@ public class MailService {
         }
     }
 
+
     public void welcomeMail(String email) throws EmailNotSendException {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
         message.setTo(email);
-        message.setText("Welcome to GAMER CENTER");
+        message.setText("Welcome to GAMER CENTER 🎉🎉🎉");
         try {
             javaMailSender.send(message);
         } catch (Exception e) {
             throw new EmailNotSendException("Email to " + email + " was not send");
         }
     }
+
 }

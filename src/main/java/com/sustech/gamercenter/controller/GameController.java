@@ -2,10 +2,11 @@ package com.sustech.gamercenter.controller;
 
 import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.service.GameService;
-import com.sustech.gamercenter.util.model.ResultService;
 import com.sustech.gamercenter.util.exception.InsufficientBalanceException;
 import com.sustech.gamercenter.util.exception.MyException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
+import com.sustech.gamercenter.util.model.JsonResponse;
+import com.sustech.gamercenter.util.model.ResultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -49,22 +50,22 @@ public class GameController {
 
     @PostMapping("/cloudUpload")
     public Object cloudUpload(@RequestParam("game_id") long gameId, @RequestParam("user_id") long userId,
-                              @RequestParam("upload_file") MultipartFile uploadFile) throws IOException{
-        gameService.cloudUpload(gameId,userId,uploadFile);
+                              @RequestParam("upload_file") MultipartFile uploadFile) throws IOException {
+        gameService.cloudUpload(gameId, userId, uploadFile);
         return ResultService.success("");
     }
 
     @GetMapping("/cloudDownload")
     public Object cloudDownload(HttpServletResponse response, @RequestParam("game_id") long gameId,
-                               @RequestParam("user_id") long userId, @RequestParam("name") String fileName)
-                                throws IOException {
+                                @RequestParam("user_id") long userId, @RequestParam("name") String fileName)
+            throws IOException {
         gameService.cloudDownload(response, gameId, userId, fileName);
         return ResultService.success("");
     }
 
     @GetMapping("/cloudList")
     public Object cloudList(HttpServletResponse response, @RequestParam("game_id") long gameId, @RequestParam("user_id")
-                            long userId) throws IOException {
+            long userId) throws IOException {
         gameService.getCloudList(response, gameId, userId);
         return ResultService.success("");
     }
@@ -101,6 +102,23 @@ public class GameController {
     public Object search(@RequestParam("tag") String tag, @RequestParam("name") String name, @RequestParam("page") int page) {
         return ResultService.success(gameService.search(tag, name, page));
 //        return ResultService.success(gameService.search(tag, name));
+    }
+
+
+    //
+    //
+    //
+    //
+    //
+
+    // check game
+    // blurry search game
+
+
+    @GetMapping
+    public JsonResponse checkUserHasGame(@RequestHeader("token") String token,
+                                         @RequestParam("game_id") Long game_id) {
+        return new JsonResponse(0,"success");
     }
 
 //    @PostMapping("/discount")

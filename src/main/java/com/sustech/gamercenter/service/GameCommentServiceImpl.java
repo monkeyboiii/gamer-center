@@ -2,6 +2,9 @@ package com.sustech.gamercenter.service;
 
 import com.sustech.gamercenter.dao.GameCommentRepository;
 import com.sustech.gamercenter.model.GameComment;
+import com.sustech.gamercenter.service.token.SimpleTokenService;
+import com.sustech.gamercenter.util.exception.DuplicateCommentException;
+import com.sustech.gamercenter.util.exception.InvalidTokenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -12,19 +15,21 @@ public class GameCommentServiceImpl implements GameCommentService {
     @Autowired
     private GameCommentRepository gameCommentRepository;
 
+    @Autowired
+    private SimpleTokenService tokenService;
+
     @Override
-    public int addComment(GameComment gameComment) {
+    public int addComment(GameComment gameComment) throws DuplicateCommentException {
         long UID = gameComment.getUser_id();
         long GID = gameComment.getGame_id();
         String content = gameComment.getContent();
         double grade = gameComment.getGrade();
-        List<GameComment> U = getCommentByUser(UID);
-        for(GameComment c : U){
-            if(c.getGame_id() == GID)
-                return -1;
-        }
 
-        return gameCommentRepository.addComment(UID, GID, content, grade);
+        try {
+            return gameCommentRepository.addComment(UID, GID, content, grade);
+        } catch (Exception exception) {
+            throw new DuplicateCommentException("User has already commented");
+        }
     }
 
     @Override
@@ -33,8 +38,8 @@ public class GameCommentServiceImpl implements GameCommentService {
     }
 
     @Override
-    public List<GameComment> getCommentByUser(long UID) {
-        return gameCommentRepository.getCommentByUser(UID);
+    public List<GameComment> getCommentByUser(String token) throws InvalidTokenException {
+        return gameCommentRepository.getCommentByUser(tokenService.getIdByToken(token));
     }
 
     @Override

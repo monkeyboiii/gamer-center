@@ -5,6 +5,7 @@ import com.sustech.gamercenter.dao.UserRepository;
 import com.sustech.gamercenter.service.AdminService;
 import com.sustech.gamercenter.service.MailService;
 import com.sustech.gamercenter.service.UserService;
+import com.sustech.gamercenter.util.exception.EmailNotSendException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,9 +59,9 @@ public class TestController {
     }
 
     @PostMapping("/mail")
-    public Object mailTest() {
+    public Object mailTest() throws EmailNotSendException {
         mailService.sendMail("11813010@mail.sustech.edu.cn", "hello", "spring boot says hello");
-        return "Send";
+        return "Sent";
     }
 
 

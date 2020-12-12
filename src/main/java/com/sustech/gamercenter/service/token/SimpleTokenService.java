@@ -8,9 +8,9 @@ import com.sustech.gamercenter.util.exception.UserNotFoundException;
 
 public interface SimpleTokenService {
 
-    String createToken(User user);
+    String createToken(User user, String role);
 
-    String createTokenFromId(Long id) throws UserNotFoundException;
+    String createTokenFromId(Long id, String role) throws UserNotFoundException;
 
     /**
      * currently used by interceptor
