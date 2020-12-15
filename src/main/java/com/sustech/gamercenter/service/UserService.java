@@ -384,4 +384,19 @@ public class UserService {
         userRepository.createOAuthToken(user_id, game_id, uuid);
         return uuid;
     }
+
+    public String checkUserHasGame(String token, Long game_id) throws InvalidTokenException {
+        Long user_id = tokenService.getIdByToken(token);
+        String status = userRepository.userHasGameStatus(user_id, game_id);
+        if (StringUtils.isEmpty(status)) {
+            return "purchase";
+        } else if (status.equals("purchased")) {
+            return "download";
+        } else if (status.equals("downloaded")) {
+            return "owned";
+        } else {
+            return "forbidden";
+        }
+    }
+
 }

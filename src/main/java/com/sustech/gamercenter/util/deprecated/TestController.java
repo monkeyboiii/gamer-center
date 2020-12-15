@@ -31,6 +31,14 @@ public class TestController {
     @Autowired
     MailService mailService;
 
+
+    //
+    //
+    //
+    //
+    //
+
+
     @GetMapping("/game")
     public Object userHasGames(@RequestParam("user_id") Long id) {
         return userRepository.userHasGames(id);
@@ -64,5 +72,13 @@ public class TestController {
         return "Sent";
     }
 
+
+    //
+
+
+    @GetMapping
+    public byte[] testManula() throws IOException {
+        return AdminService.getManual("user");
+    }
 
 }

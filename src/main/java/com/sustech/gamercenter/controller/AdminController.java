@@ -2,7 +2,6 @@ package com.sustech.gamercenter.controller;
 
 import com.sustech.gamercenter.service.AdminService;
 import com.sustech.gamercenter.service.UserService;
-import com.sustech.gamercenter.util.exception.UnauthorizedAttemptException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import com.sustech.gamercenter.util.exception.UserRegisterException;
 import com.sustech.gamercenter.util.model.JsonResponse;
@@ -24,7 +23,7 @@ public class AdminController {
     UserService userService;
 
 
-    //@AuthToken(role = "a")
+    //    @AuthToken(role = "a")
     @PostMapping("/user/create")
     public JsonResponse createUser(
 //            @RequestHeader("token") String token,
@@ -32,26 +31,12 @@ public class AdminController {
             @RequestParam("user_email") String email,
             @RequestParam("password") String password,
             @RequestParam("role") String role
-    ) throws UserRegisterException, UnauthorizedAttemptException {
+    ) throws UserRegisterException {
         return new JsonResponse(0, "Successfully created", adminService.createUser(name, email, password, role));
     }
 
 
-    //@AuthToken
-    @GetMapping("/user")
-    public JsonResponse getUserList(
-//            @RequestHeader("token") String token,
-            @RequestParam(value = "filter", required = false) String filter,
-            @RequestParam(value = "value", required = false) String value,
-            @RequestParam(value = "page_num", required = false, defaultValue = "0") Integer pageNum,
-            @RequestParam(value = "page_size", required = false, defaultValue = "6") Integer pageSize
-    ) {
-        adminService.getUserList(filter, value, pageNum, pageSize);
-        return new JsonResponse(0, "Successfully retrieved");
-    }
-
-
-    //@AuthToken
+    //@AuthToken(role = "a")
     @GetMapping("/user/info")
     public JsonResponse getUserInfo(
 //            @RequestHeader("token") String token,
@@ -71,7 +56,20 @@ public class AdminController {
     }
 
 
-    //@AuthToken
+    //    @AuthToken(role = "a")
+    @GetMapping("/user")
+    public JsonResponse getUserList(
+//            @RequestHeader("token") String token,
+            @RequestParam(value = "filter", required = false) String filter,
+            @RequestParam(value = "value", required = false) String value,
+            @RequestParam(value = "page_num", required = false, defaultValue = "0") Integer pageNum,
+            @RequestParam(value = "page_size", required = false, defaultValue = "6") Integer pageSize
+    ) {
+        return new JsonResponse(0, "Successfully retrieved", adminService.getUserList(filter, value, pageNum, pageSize));
+    }
+
+
+    //@AuthToken(role = "a")
     @PostMapping("/user/account/lock")
     public JsonResponse lockOrUnlockAccount(
 //            @RequestHeader("token") String token,
@@ -94,7 +92,7 @@ public class AdminController {
     }
 
 
-    //@AuthToken
+    //@AuthToken(role = "a")
     @PostMapping("/user/assign")
     public JsonResponse assignUserRoleById(
 //            @RequestHeader("token") String token,
@@ -110,21 +108,48 @@ public class AdminController {
     //
     //
     //
+    // manual
+
+
+    //@AuthToken(role = "a")
+    @PostMapping("/manual")
+    public JsonResponse uploadUserManual(@RequestParam(value = "type", defaultValue = "user", required = false) String type,
+                                         @RequestParam("manual") MultipartFile manual) throws IOException {
+        adminService.uploadManual(type, manual);
+        return new JsonResponse(0, "Success");
+    }
+
+    //
+    //
+    //
+    //
     // community
 
 
-    //@AuthToken
-    @DeleteMapping("/community/comment")
+    //@AuthToken(role = "a")
+    @DeleteMapping("/comment")
     public JsonResponse deleteCommentById(
 //            @RequestHeader("token") String token,
             @RequestParam("comment_id") Integer comment_id
     ) {
-
+        adminService.deleteCommentById(comment_id);
         return new JsonResponse(0, "Successfully deleted");
     }
 
 
-    //@AuthToken
+    //@AuthToken(role = "a")
+    @PostMapping("/comment/visible")
+    public JsonResponse setCommentVisibilityById(
+//            @RequestHeader("token") String token,
+            @RequestParam("comment_id") Integer comment_id,
+            @RequestParam("visible") Boolean visible
+    ) {
+        adminService.setCommentVisibility(comment_id, visible);
+        return new JsonResponse(0, "Successfully deleted");
+    }
+
+
+    //@AuthToken(role = "a")
     @DeleteMapping("/community/post")
     public JsonResponse deletePostById(
 //            @RequestHeader("token") String token,
@@ -132,15 +157,6 @@ public class AdminController {
     ) {
 
         return new JsonResponse(0, "Successfully deleted");
-    }
-
-
-    //@AuthToken
-    @PostMapping("/manual")
-    public JsonResponse uploadUserManual(@RequestParam(value = "type", defaultValue = "user", required = false) String type,
-                                         @RequestParam("manual") MultipartFile manual) throws IOException {
-        adminService.uploadManual(type, manual);
-        return new JsonResponse(0, "Success");
     }
 
 

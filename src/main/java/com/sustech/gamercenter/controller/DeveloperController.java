@@ -16,12 +16,26 @@ public class DeveloperController {
     @Autowired
     DeveloperService developerService;
 
+    @AuthToken(role = "d")
+    @GetMapping("/game")
+    public JsonResponse getDevelopersGames(@RequestHeader("token") String token,
+                                           @RequestParam(value = "tag", defaultValue = "", required = false) String tag) throws InvalidTokenException {
+        return new JsonResponse(0, "Success", developerService.getDevelopersGamesWithTag(token, tag));
+    }
+
+
+    //
+    //
+    //
+    //
+    //
+
 
     @AuthToken(role = "d")
     @GetMapping("/player/info/unsafe")
     public JsonResponse getPlayerInfoNoOAuth(@RequestHeader("token") String token,
                                              @RequestParam("user_id") Long user_id,
-                                             @RequestParam("game_id") Long game_id) {
+                                             @RequestParam("game_id") Long game_id) throws InvalidTokenException {
         return new JsonResponse(0, "Success", developerService.getPlayerInfoNoOAuth(token, user_id, game_id));
     }
 
@@ -38,6 +52,15 @@ public class DeveloperController {
     public JsonResponse getPlayerToGame(@RequestHeader("token") String token,
                                         @RequestParam("game_id") Long game_id) throws InvalidTokenException {
         return new JsonResponse(0, "Success", developerService.getPlayerToGame(token, game_id));
+    }
+
+    @AuthToken(role = "d")
+    @PostMapping
+    public JsonResponse pushNotification(@RequestHeader("token") String token,
+                                         @RequestParam(value = "user_id", defaultValue = "-1", required = false) Long user_id
+    ) {
+
+        return new JsonResponse(0, "Success");
     }
 
 

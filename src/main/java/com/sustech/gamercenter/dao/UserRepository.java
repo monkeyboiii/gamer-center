@@ -5,6 +5,8 @@ import com.sustech.gamercenter.dao.projection.GameView;
 import com.sustech.gamercenter.dao.projection.MessageView;
 import com.sustech.gamercenter.dao.projection.UserView;
 import com.sustech.gamercenter.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,6 +22,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 
     Optional<User> findByEmail(String email);
+
+
+    Page<User> findAllByNameLike(String value, Pageable pageable);
+
+
+    @Query(value = "select * from users u where name like CONCAT(?1,'%') ", nativeQuery = true)
+    Page<User> findAllByNameStartsWith(String value, Pageable pageable);
+
+
+    Page<User> findAllByCreatedAtAfter(String value, Pageable pageable);
 
 
     //
@@ -42,6 +54,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "from game " +
             "where id in (select game_id from users_games where user_id = ?1)", nativeQuery = true)
     List<GameView> userHasGames(Long id);
+
+
+    @Query(value = "select status " +
+            "from users_games " +
+            "where user_id =?1 and game_id = ?2 ", nativeQuery = true)
+    String userHasGameStatus(Long user_id, Long game_id);
 
 
     @Query(value = "select * " +

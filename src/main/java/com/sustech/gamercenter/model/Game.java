@@ -17,7 +17,9 @@ public class Game {
     private double price;
     private double score;
     private String description;
-    private long developer_id;
+
+    @Column(name = "developer_id")
+    private long developerId;
     private String tag;
     private String branch;
 
@@ -75,12 +77,12 @@ public class Game {
         this.description = description;
     }
 
-    public long getDeveloper_id() {
-        return developer_id;
+    public long getDeveloperId() {
+        return developerId;
     }
 
-    public void setDeveloper_id(long developer_id) {
-        this.developer_id = developer_id;
+    public void setDeveloperId(long developer_id) {
+        this.developerId = developer_id;
     }
 
     public String getTag() {

@@ -1,21 +1,28 @@
 package com.sustech.gamercenter.service;
 
+import com.sustech.gamercenter.dao.GameCommentRepository;
 import com.sustech.gamercenter.dao.UserRepository;
+import com.sustech.gamercenter.model.GameComment;
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
-import com.sustech.gamercenter.util.exception.UnauthorizedAttemptException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import com.sustech.gamercenter.util.exception.UserRegisterException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.io.IOUtils;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import javax.persistence.EntityNotFoundException;
+import java.io.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminService {
@@ -32,8 +39,11 @@ public class AdminService {
     @Autowired
     PasswordEncoder encoder;
 
+    @Autowired
+    GameCommentRepository gameCommentRepository;
 
-    public User createUser(String name, String email, String password, String role) throws UserRegisterException, UnauthorizedAttemptException {
+
+    public User createUser(String name, String email, String password, String role) throws UserRegisterException {
         try {
             password = encoder.encode(password);
             User user = new User(name, email, password, role);
@@ -63,11 +73,17 @@ public class AdminService {
         userRepository.flush();
     }
 
-    //    public List<UserView> getUserList(String filter, String value, Integer pageNum, Integer pageSize) {
-    public void getUserList(String filter, String value, Integer pageNum, Integer pageSize) {
-        // TODO
-
-        userRepository.findAll();
+    public Page<? extends Serializable> getUserList(String filter, String value, Integer pageNum, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNum, pageSize);
+        if (filter.equals("nameLike")) {
+            return userRepository.findAllByNameLike(value, pageable);
+        } else if (filter.equals("nameStartsWith")) {
+            return userRepository.findAllByNameStartsWith(value, pageable);
+        } else if (filter.equals("createdAfter")) {
+            return userRepository.findAllByCreatedAtAfter(value, pageable);
+        } else {
+            return userRepository.findAll(pageable);
+        }
     }
 
 
@@ -75,38 +91,69 @@ public class AdminService {
     //
     //
     //
-    //
+    // manual
 
 
-    private final static String STORAGE_PREFIX = System.getProperty("user.dir");
-    private final static Logger logger = LoggerFactory.getLogger(AdminService.class);
-
-
-    public byte[] getManual(String id) throws IOException {
-        String path = File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
-                + "static" + File.separator + "admin" + File.separator + "manual";
-        File file = new File(path);
-        FileInputStream inputStream = new FileInputStream(file);
-        byte[] bytes = new byte[inputStream.available()];
-        inputStream.read(bytes, 0, inputStream.available());
-        return bytes;
-    }
+    private static final String STORAGE = System.getProperty("user.dir");
+    private static final String MANUAL = STORAGE + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
+            + "static" + File.separator + "admin" + File.separator + "manual";
 
     public void uploadManual(String type, MultipartFile manual) throws IOException {
-//        if(manual.getContentType().contains("exe")){
-//
-//        }
-        // todo check malicious content
-
-        String path = File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
-                + "static" + File.separator + "admin" + File.separator + "manual";
-        String realPath = STORAGE_PREFIX + path;
-        File dir = new File(realPath);
-
-//        String filename = type + "_manual_" + manual.getOriginalFilename();
-        String filename = "manual_" + manual.getOriginalFilename();
+        File dir = new File(MANUAL);
+        String filename = type + "-manual" + manual.getOriginalFilename().split("\\.")[1];
         File fileServer = new File(dir, filename);
-        manual.transferTo(fileServer);
+
+        try {
+            if (fileServer.exists())
+                fileServer.delete();
+            manual.transferTo(fileServer);
+        } catch (IOException | IllegalStateException e) {
+            throw new FileUploadException("Manual of " + type + " cannot be uploaded");
+        }
     }
 
+    public static byte[] getManual(String type) throws IOException {
+        File path = new File(MANUAL);
+        File[] manuals = path.listFiles();
+        if (manuals.length == 0) {
+            throw new FileNotFoundException("Manual of " + type + " is not ready");
+        }
+
+        List<File> valids = Arrays.stream(manuals)
+                .filter(x -> x.getName().contains(type + "-manual"))
+                .collect(Collectors.toList());
+        if (valids.isEmpty()) {
+            throw new FileNotFoundException("Manual of " + type + " is not found");
+        }
+        FileInputStream inputStream = new FileInputStream(valids.get((int) (Math.random() * valids.size())));
+        return IOUtils.toByteArray(inputStream);
+    }
+
+
+    //
+    //
+    //
+    //
+    // comment
+
+
+    public void setCommentVisibility(Integer comment_id, Boolean visible) {
+        Optional<GameComment> gameComment = gameCommentRepository.findById(comment_id);
+        if (gameComment.isPresent()) {
+            gameComment.get().setVisible(visible);
+            gameCommentRepository.flush();
+        } else {
+            throw new EntityNotFoundException("Comment of id # " + comment_id.toString() + " is not present");
+        }
+    }
+
+    public void deleteCommentById(Integer comment_id) {
+        Optional<GameComment> gameComment = gameCommentRepository.findById(comment_id);
+        if (gameComment.isPresent()) {
+            gameCommentRepository.delete(gameComment.get());
+            gameCommentRepository.flush();
+        } else {
+            throw new EntityNotFoundException("Comment of id # " + comment_id.toString() + " is not present");
+        }
+    }
 }

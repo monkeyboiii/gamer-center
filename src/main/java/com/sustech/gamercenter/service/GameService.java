@@ -2,7 +2,6 @@ package com.sustech.gamercenter.service;
 
 import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.model.GameContent;
-//import com.sustech.gamercenter.model.GameDiscount;
 import com.sustech.gamercenter.util.exception.InsufficientBalanceException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import org.springframework.data.domain.Page;
@@ -11,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+
+//import com.sustech.gamercenter.model.GameDiscount;
 
 public interface GameService {
     void purchase(long userId, long gameId) throws UserNotFoundException, InsufficientBalanceException;
@@ -37,6 +38,6 @@ public interface GameService {
 
     void cloudDownload(HttpServletResponse response, long gameId, long userId, String fileName) throws IOException;
 
-    void getCloudList(HttpServletResponse response, long gameId, long userId) throws IOException ;
+    void getCloudList(HttpServletResponse response, long gameId, long userId) throws IOException;
 //    public Object findById(long id);
 }

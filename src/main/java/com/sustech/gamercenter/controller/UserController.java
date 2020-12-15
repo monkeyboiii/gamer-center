@@ -3,6 +3,7 @@ package com.sustech.gamercenter.controller;
 
 import com.sustech.gamercenter.security.AuthToken;
 import com.sustech.gamercenter.security.AuthorizationInterceptor;
+import com.sustech.gamercenter.service.AdminService;
 import com.sustech.gamercenter.service.UserService;
 import com.sustech.gamercenter.util.exception.*;
 import com.sustech.gamercenter.util.model.JsonResponse;
@@ -313,5 +314,10 @@ public class UserController {
         return ResultService.success("");
     }
 
+
+    @GetMapping(value = "/manual")
+    public byte[] getManual(@RequestParam(value = "type", defaultValue = "user", required = false) String type) throws IOException {
+        return AdminService.getManual(type);
+    }
 
 }

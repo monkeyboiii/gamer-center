@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface GameRepository extends JpaRepository<Game, Long> {
 
     Game findByName(String name);
@@ -27,4 +29,9 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     @Query(value = "select * from game g where g.announce_date <= :today", nativeQuery = true)
     Page<Game> findAllGame(@Param("today") String today, Pageable pageable);
+
+
+    List<Game> findAllByDeveloperIdAndTagIgnoreCase(Long id, String tag);
+
+    List<Game> findAllByDeveloperId(Long id);
 }

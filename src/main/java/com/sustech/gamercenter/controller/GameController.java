@@ -1,8 +1,11 @@
 package com.sustech.gamercenter.controller;
 
 import com.sustech.gamercenter.model.Game;
+import com.sustech.gamercenter.security.AuthToken;
 import com.sustech.gamercenter.service.GameService;
+import com.sustech.gamercenter.service.UserService;
 import com.sustech.gamercenter.util.exception.InsufficientBalanceException;
+import com.sustech.gamercenter.util.exception.InvalidTokenException;
 import com.sustech.gamercenter.util.exception.MyException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import com.sustech.gamercenter.util.model.JsonResponse;
@@ -25,6 +28,10 @@ public class GameController {
 
     @Autowired
     private GameService gameService;
+
+    @Autowired
+    UserService userService;
+
 
     @GetMapping("/info")
     public Object getGame(@RequestParam("id") long id) {
@@ -111,14 +118,12 @@ public class GameController {
     //
     //
 
-    // check game
-    // blurry search game
 
-
-    @GetMapping
+    @AuthToken(role = "p")
+    @GetMapping("/status")
     public JsonResponse checkUserHasGame(@RequestHeader("token") String token,
-                                         @RequestParam("game_id") Long game_id) {
-        return new JsonResponse(0,"success");
+                                         @RequestParam("game_id") Long game_id) throws InvalidTokenException {
+        return new JsonResponse(0, "success", userService.checkUserHasGame(token, game_id));
     }
 
 //    @PostMapping("/discount")

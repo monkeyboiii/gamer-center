@@ -8,9 +8,20 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface GameCommentRepository extends JpaRepository<GameComment, Long> {
+
+    Optional<GameComment> findById(Integer comment_id);
+
+
+    //
+    //
+    //
+    //
+    //
+
 
     @Query(value = "select * from game_comment where user_id = ?1 and visible = true ", nativeQuery = true)
     List<GameComment> getCommentByUser(long UID);
@@ -34,4 +45,5 @@ public interface GameCommentRepository extends JpaRepository<GameComment, Long> 
     @Modifying
     @Query(value = "insert into game_comment(user_id, game_id, content, grade) value(?1,?2,?3,?4)", nativeQuery = true)
     int addComment(long UID, long GID, String content, double grade);
+
 }
