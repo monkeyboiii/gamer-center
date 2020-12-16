@@ -43,6 +43,11 @@ public class GameCommentController {
         return ResultService.success(gameCommentService.getCommentByGame(GID));
     }
 
+    @GetMapping(value = "/GID/{id:\\d+}")
+    public Object getCommentByGamePath(@PathVariable("id") long GID) {
+        return ResultService.success(gameCommentService.getCommentByGame(GID));
+    }
+
     @GetMapping("/UID")
     public Object getCommentByUser(@RequestHeader("token") String token) throws InvalidTokenException {
         return ResultService.success(gameCommentService.getCommentByUser(token));

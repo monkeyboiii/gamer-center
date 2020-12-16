@@ -119,11 +119,33 @@ public class AdminController {
         return new JsonResponse(0, "Success");
     }
 
+
     //
     //
     //
     //
-    // community
+    // comment
+
+
+    //@AuthToken(role = "a")
+    @GetMapping("/comment/report/list")
+    public JsonResponse getReportedCommentList(
+//            @RequestHeader("token") String token,
+            @RequestParam(value = "page_num", defaultValue = "0", required = false) Integer pageNum,
+            @RequestParam(value = "page_size", defaultValue = "6", required = false) Integer pageSize
+    ) {
+        return new JsonResponse(0, "Successfully retrieved", adminService.getReportedCommentList(pageNum, pageSize));
+    }
+
+
+    @GetMapping("/comment/report")
+    public JsonResponse getReportedCommentDetail(
+//            @RequestHeader("token") String token,
+            @RequestParam("comment_id") Integer comment_id
+    ) {
+        adminService.deleteCommentById(comment_id);
+        return new JsonResponse(0, "Successfully deleted");
+    }
 
 
     //@AuthToken(role = "a")

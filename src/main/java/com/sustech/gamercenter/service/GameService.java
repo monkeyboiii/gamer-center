@@ -2,7 +2,10 @@ package com.sustech.gamercenter.service;
 
 import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.model.GameContent;
+import com.sustech.gamercenter.model.GameDLC;
+import com.sustech.gamercenter.util.exception.ContentNotPurchasedException;
 import com.sustech.gamercenter.util.exception.InsufficientBalanceException;
+import com.sustech.gamercenter.util.exception.InvalidTokenException;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,5 +42,24 @@ public interface GameService {
     void cloudDownload(HttpServletResponse response, long gameId, long userId, String fileName) throws IOException;
 
     void getCloudList(HttpServletResponse response, long gameId, long userId) throws IOException;
-//    public Object findById(long id);
+
+
+    //
+    //
+    //
+    //
+    // DLC
+
+
+    GameDLC createDLC(String token, Long game_id, String name, Double price, Boolean visible) throws IllegalArgumentException, InvalidTokenException;
+
+    List<GameDLC> getGameDLCs(Long game_id);
+
+    void uploadDLCContent(Long id, MultipartFile file) throws IOException;
+
+    void purchaseDLC(String token, Long id) throws InvalidTokenException, UserNotFoundException, InsufficientBalanceException;
+
+    byte[] downloadDLCContent(String token, Long id) throws IOException, InvalidTokenException, ContentNotPurchasedException;
+
+
 }

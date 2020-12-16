@@ -41,6 +41,9 @@ public class UserService {
     GameRepository gameRepository;
 
     @Autowired
+    GameCommentRepository gameCommentRepository;
+
+    @Autowired
     MessageRepository messageRepository;
 
     @Autowired
@@ -121,6 +124,7 @@ public class UserService {
         } else if (encoder.matches(password, user.getPassword())) {
             Map<String, String> map = new HashMap<>();
             map.put("user_id", user.getId().toString());
+            map.put("user_name", user.getName());
             map.put("token", tokenService.createToken(user, role.toLowerCase()));
             return map;
         } else {
@@ -295,7 +299,7 @@ public class UserService {
                 .build();
     }
 
-    public void purchaseGame(Long userId, Long devId, Long gameId, Double price) throws UserNotFoundException, InsufficientBalanceException {
+    private Long purchase(Long userId, Long devId, Long gameId, Double price) throws InsufficientBalanceException, UserNotFoundException {
         // actual transferring
         transfer(price, userId, devId);
 
@@ -308,7 +312,17 @@ public class UserService {
         paymentRepository.save(payment);
         paymentRepository.save(receive);
 
-        paymentRepository.receiveGame(userId, gameId, payment.getId());
+        return payment.getId();
+    }
+
+    public void purchaseGame(Long userId, Long devId, Long gameId, Double price) throws UserNotFoundException, InsufficientBalanceException {
+        Long paymentId = purchase(userId, devId, gameId, price);
+        paymentRepository.receiveGame(userId, gameId, paymentId);
+    }
+
+    public void purchaseGameDLC(Long userId, Long devId, Long gameId, Long DLCId, Double price) throws InsufficientBalanceException, UserNotFoundException {
+        Long paymentId = purchase(userId, devId, gameId, price);
+        paymentRepository.receiveGameDLC(userId, gameId, DLCId, paymentId);
     }
 
     public List<String> userHasGameTags(String token) throws InvalidTokenException {
@@ -397,6 +411,19 @@ public class UserService {
         } else {
             return "forbidden";
         }
+    }
+
+
+    //
+    //
+    //
+    //
+    // comment
+
+
+    public void reportComment(String token, Long comment_id, String reason) throws InvalidTokenException {
+        Long id = tokenService.getIdByToken(token);
+        gameCommentRepository.reportComment(comment_id, id, reason);
     }
 
 }

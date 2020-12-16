@@ -84,7 +84,7 @@ public class UserController {
 
     @GetMapping(value = "/collection/download/**", produces =
             {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public byte[] moduleStrings(HttpServletRequest request) throws IOException {
+    public byte[] downloadCollection(HttpServletRequest request) throws IOException {
 //    public byte[] downloadCollection(@RequestParam("path") String path) throws IOException {
         String requestURL = request.getRequestURL().toString();
         String path = requestURL.split("/collection/download/")[1];
@@ -318,6 +318,23 @@ public class UserController {
     @GetMapping(value = "/manual")
     public byte[] getManual(@RequestParam(value = "type", defaultValue = "user", required = false) String type) throws IOException {
         return AdminService.getManual(type);
+    }
+
+
+    //
+    //
+    //
+    //
+    //
+
+
+    @AuthToken
+    @PostMapping
+    public JsonResponse reportComment(@RequestHeader("token") String token,
+                                      @RequestParam("comment_id") Long comment_id,
+                                      @RequestParam(value = "reason", defaultValue = "inappropriate content", required = false) String reason) throws InvalidTokenException {
+        userService.reportComment(token, comment_id, reason);
+        return new JsonResponse(0, "Successfully reported");
     }
 
 }

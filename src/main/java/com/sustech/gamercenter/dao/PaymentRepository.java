@@ -17,4 +17,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     void receiveGame(Long user_id, Long game_id, Long purchase_id);
 
 
+    @Modifying
+    @Query(value = "insert into users_games (user_id, game_id, dlc_id, purchase_id, user_tag) " +
+            "values(?1, ?2, ?3, ?4,'DLC')", nativeQuery = true)
+    @Transactional
+    void receiveGameDLC(Long user_id, Long game_id, Long dlc_id, Long purchase_id);
 }

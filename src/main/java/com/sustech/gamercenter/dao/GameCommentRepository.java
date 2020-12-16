@@ -1,5 +1,6 @@
 package com.sustech.gamercenter.dao;
 
+import com.sustech.gamercenter.dao.projection.CommentStat;
 import com.sustech.gamercenter.model.GameComment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -45,5 +46,32 @@ public interface GameCommentRepository extends JpaRepository<GameComment, Long> 
     @Modifying
     @Query(value = "insert into game_comment(user_id, game_id, content, grade) value(?1,?2,?3,?4)", nativeQuery = true)
     int addComment(long UID, long GID, String content, double grade);
+
+
+    //
+    //
+    //
+    //
+    // report
+
+
+    @Modifying
+    @Query(value = "insert into comment_report(comment_id, user_id, reason) " +
+            "values(?1, ?2, ?3) ", nativeQuery = true)
+    @Transactional
+    void reportComment(Long comment_id, Long id, String reason);
+
+
+    @Query(value = "select cr.comment_id as comment_id, " +
+            "gc.content as content, " +
+            "gc.user_id as reportee_id, " +
+            "gc.game_id as game_id, " +
+            "count(cr.comment_id) as total " +
+            "from comment_report cr " +
+            "    left join game_comment gc on cr.comment_id = gc.id " +
+            "where resolved = false " +
+            "group by cr.comment_id " +
+            "limit ?2 offset ?1 ", nativeQuery = true)
+    List<CommentStat> getCommentStat(Integer offset, Integer pageSize);
 
 }

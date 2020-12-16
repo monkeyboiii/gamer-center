@@ -2,6 +2,7 @@ package com.sustech.gamercenter.service;
 
 import com.sustech.gamercenter.dao.GameCommentRepository;
 import com.sustech.gamercenter.dao.UserRepository;
+import com.sustech.gamercenter.dao.projection.CommentStat;
 import com.sustech.gamercenter.model.GameComment;
 import com.sustech.gamercenter.model.User;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
@@ -155,5 +156,9 @@ public class AdminService {
         } else {
             throw new EntityNotFoundException("Comment of id # " + comment_id.toString() + " is not present");
         }
+    }
+
+    public List<CommentStat> getReportedCommentList(Integer pageNum, Integer pageSize) {
+        return gameCommentRepository.getCommentStat(pageNum * pageSize, pageSize);
     }
 }
