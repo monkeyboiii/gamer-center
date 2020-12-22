@@ -9,6 +9,8 @@ public interface UserView {
 
     String getName();
 
+    String getEmail();
+
     String getBio();
 
     String getAvatar();

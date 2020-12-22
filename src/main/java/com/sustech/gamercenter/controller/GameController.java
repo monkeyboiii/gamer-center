@@ -54,8 +54,10 @@ public class GameController {
         return ResultService.success(gameService.save(game));
     }
 
-    @GetMapping("/purchase")
-    public Object purchase(@RequestParam("user_id") long userId, @RequestParam("game_id") long gameId) throws InsufficientBalanceException, UserNotFoundException {
+    @AuthToken
+    @PostMapping("/purchase")
+    public Object purchase(@RequestParam("user_id") long userId,
+                           @RequestParam("game_id") long gameId) throws InsufficientBalanceException, UserNotFoundException {
         gameService.purchase(userId, gameId);
         return ResultService.success("");
     }
@@ -91,6 +93,10 @@ public class GameController {
         return gameService.getFile(url, "image");
     }
 
+    @GetMapping(value = "/getVideo/{url:.+}", produces = MediaType.ALL_VALUE)
+    public byte[] getVideo(@PathVariable("url") String url) throws IOException {
+        return gameService.getFile(url, "video");
+    }
 
     @GetMapping("/download")
     public Object fileDownLoad(HttpServletResponse response, @RequestParam("name") String fileName,
@@ -190,7 +196,7 @@ public class GameController {
     }
 
 
-    @GetMapping("/dlc/purchase")
+    @PostMapping("/dlc/purchase")
     public JsonResponse purchaseDLC(@RequestHeader("token") String token,
                                     @RequestParam("id") Long id) throws InvalidTokenException, InsufficientBalanceException, UserNotFoundException {
         gameService.purchaseDLC(token, id);

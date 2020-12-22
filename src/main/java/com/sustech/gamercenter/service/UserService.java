@@ -41,6 +41,9 @@ public class UserService {
     GameRepository gameRepository;
 
     @Autowired
+    GameDLCRepository gameDLCRepository;
+
+    @Autowired
     GameCommentRepository gameCommentRepository;
 
     @Autowired
@@ -293,6 +296,8 @@ public class UserService {
                 .user(userRepository.getOne(id))
                 .friends(userRepository.userHasFriends(id))
                 .games(userRepository.userHasGames(id))
+                .gameDLCs(gameDLCRepository.userHasGameDLCs(id))
+
 //                .messages(messageRepository.findAllByUserIdAndUnread(id, true))
 //                .messages(userRepository.userHasAllMessages(id))
                 .messages(userRepository.userHasUnreadMessages(id, true))
@@ -349,6 +354,18 @@ public class UserService {
     public void sendMessageTo(String token, String to_name, String type, String message) throws InvalidTokenException, UserNotFoundException {
         Long from = tokenService.getIdByToken(token);
         Long to = queryUserByName(to_name).getId();
+
+        if (type.equals("invitation")) {
+            String gameName = gameRepository.getOne(Long.valueOf(message)).getName();
+            message = "Let's play " + gameName + " together!";
+        }
+
+        userRepository.sendMessage(from, to, type, message);
+    }
+
+    public void sendMessageTo(String token, Long to_id, String type, String message) throws InvalidTokenException, UserNotFoundException {
+        Long from = tokenService.getIdByToken(token);
+        Long to = queryUserById(to_id).getId();
 
         if (type.equals("invitation")) {
             String gameName = gameRepository.getOne(Long.valueOf(message)).getName();

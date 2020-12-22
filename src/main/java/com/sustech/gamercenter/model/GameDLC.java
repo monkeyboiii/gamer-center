@@ -1,6 +1,8 @@
 package com.sustech.gamercenter.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -18,6 +20,7 @@ public class GameDLC {
 
     private Double price;
 
+    @JsonIgnore
     private String path;
 
     private Boolean visible;

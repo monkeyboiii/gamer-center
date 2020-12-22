@@ -52,7 +52,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "select * " +
             "from game " +
-            "where id in (select game_id from users_games where user_id = ?1)", nativeQuery = true)
+            "where id in (select game_id from users_games where user_id = ?1 and dlc_id is null)", nativeQuery = true)
     List<GameView> userHasGames(Long id);
 
 
@@ -85,6 +85,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "where id = ?2 " +
             "and developer_id = ?1)) ", nativeQuery = true)
     List<UserView> getPlayerToGame(Long dev, Long game_id);
+
+
+    @Query(value = "select * " +
+            "from users " +
+            "where id = ?1 ", nativeQuery = true)
+    UserView getUserViewById(Long id);
 
 
     //
@@ -156,4 +162,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "(SELECT * FROM users_games_tokens WHERE token = ?1) ", nativeQuery = true)
     int validateOAuthToken(String oAuthToken);
 
+
+    @Query(value = "select distinct user_id " +
+            "from users_games " +
+            "where game_id = ?1 ", nativeQuery = true)
+    List<Long> getPlayerIdsToGame(Long game_id);
 }

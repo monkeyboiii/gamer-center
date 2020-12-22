@@ -104,8 +104,16 @@ public class UserController {
     public JsonResponse sendMessageTo(@RequestHeader("token") String token,
                                       @RequestParam(value = "type", defaultValue = "chat", required = false) String type,
                                       @RequestParam("message") String message,
-                                      @RequestParam("to") String to_name) throws InvalidTokenException, UserNotFoundException {
-        userService.sendMessageTo(token, to_name, type, message);
+                                      @RequestParam(value = "to", required = false) String to_name,
+                                      @RequestParam(value = "to_id",defaultValue = "-1",required = false) Long to_id
+    ) throws InvalidTokenException, UserNotFoundException {
+        if(!StringUtils.isEmpty(to_name))
+            userService.sendMessageTo(token, to_name, type, message);
+        else if(to_id != null)
+            userService.sendMessageTo(token, to_id, type, message);
+        else
+            return new JsonResponse(-1,"Either user name or user id is required");
+
         return new JsonResponse(0, "Successfully sent");
     }
 
