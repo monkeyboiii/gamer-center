@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +42,11 @@ public class GameController {
 
     @PostMapping("/create")
     public Object createGame(Game game) {
-        if (gameService.existedName(game.getName(), -1)) {
+        Game g = gameService.findByName(game.getName());
+//        if (gameService.existedName(game.getName(), -1)) {
+//            throw new MyException(-1, "Game's name already existed.");
+//        }
+        if (g != null && g.getBranch().equals(game.getBranch())) {
             throw new MyException(-1, "Game's name already existed.");
         }
         return ResultService.success(gameService.save(game));
@@ -110,6 +115,19 @@ public class GameController {
         gameService.download(response, fileName, type);
     }
 
+    @GetMapping("/installation")
+    public void installationDownLoad(HttpServletResponse response,
+                                     @RequestParam("name") String fileName,
+                                     @RequestParam("type") String type,
+                                     @RequestParam("date") String date) throws IOException {
+        SimpleDateFormat tempDate = new SimpleDateFormat("yyyy-MM-dd");
+        String today = tempDate.format(new java.util.Date());
+        if(today.compareTo(date) < 0){
+            throw new MyException(-1, "Game has not been released.");
+        }
+        gameService.download(response, fileName, type);
+    }
+
 
     @AuthToken
     @GetMapping("cloud/list")
@@ -150,7 +168,7 @@ public class GameController {
     //
 
 
-    @AuthToken(role = "p")
+    @AuthToken
     @GetMapping("/status")
     public JsonResponse checkUserHasGame(@RequestHeader("token") String token,
                                          @RequestParam("game_id") Long game_id) throws InvalidTokenException {

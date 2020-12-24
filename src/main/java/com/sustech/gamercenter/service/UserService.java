@@ -135,6 +135,16 @@ public class UserService {
         }
     }
 
+    public Map<String, String> loginAuthentication(String email, String password, Long gameId) throws UserNotFoundException, IncorrectPasswordException, UserHasNoRoleException, UserAccountLockedException, InvalidTokenException, GameOwnershipException {
+        Map<String, String> map = loginAuthentication(email, password, "p");
+        if (checkUserHasGame(map.get("token"), gameId).equals("purchase")) {
+            throw new GameOwnershipException("Game not purchased");
+        } else {
+            return map;
+        }
+    }
+
+
     public void logout(String token) throws UserHasNoTokenException, InvalidTokenException {
         tokenService.deleteToken(token);
     }
@@ -442,5 +452,6 @@ public class UserService {
         Long id = tokenService.getIdByToken(token);
         gameCommentRepository.reportComment(comment_id, id, reason);
     }
+
 
 }

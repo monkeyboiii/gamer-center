@@ -46,7 +46,7 @@ public interface GameService {
 
     List<String> listCloudSave(Long game_id, Long user_id) throws FileNotFoundException;
 
-
+    Game findByName(String name);
     //
     //
     //

@@ -37,6 +37,12 @@ public class UserController {
     UserService userService;
 
 
+    @GetMapping("/find")
+    public JsonResponse getUsersByName(@RequestParam("name") String name) throws UserNotFoundException {
+        return new JsonResponse(0, "Success", userService.queryUserByName(name));
+    }
+
+
     @AuthToken
     @GetMapping("/info")
     public JsonResponse getUserInfo(@RequestHeader("token") String token) throws InvalidTokenException {
@@ -170,6 +176,19 @@ public class UserController {
                 .code(0)
                 .msg("Successfully logged in")
                 .data(userService.loginAuthentication(email, password, role))
+                .build();
+    }
+
+
+    @PostMapping("/login/game")
+    public JsonResponse SDKUserLogin(
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            @RequestParam("game_id") Long gameId) throws UserNotFoundException, UserAccountLockedException, IncorrectPasswordException, UserHasNoRoleException, GameOwnershipException, InvalidTokenException {
+        return new JsonResponse.builder()
+                .code(0)
+                .msg("Successfully logged in")
+                .data(userService.loginAuthentication(email, password, gameId))
                 .build();
     }
 
@@ -308,7 +327,7 @@ public class UserController {
     // avatar
 
 
-    @GetMapping(value = "/avatar/{id:[0-9]+}", produces = {MediaType.IMAGE_JPEG_VALUE,MediaType.IMAGE_PNG_VALUE,MediaType.IMAGE_GIF_VALUE})
+    @GetMapping(value = "/avatar/{id:[0-9]+}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_GIF_VALUE})
     public byte[] getAvatar(@PathVariable("id") String id) throws IOException {
         return userService.getAvatar(id);
     }
@@ -323,7 +342,7 @@ public class UserController {
     }
 
 
-    @GetMapping(value = "/manual")
+    @GetMapping(value = "/manual", produces = MediaType.APPLICATION_PDF_VALUE)
     public byte[] getManual(@RequestParam(value = "type", defaultValue = "user", required = false) String type) throws IOException {
         return AdminService.getManual(type);
     }

@@ -31,7 +31,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findAllByNameStartsWith(String value, Pageable pageable);
 
 
-    Page<User> findAllByCreatedAtAfter(String value, Pageable pageable);
+    Page<User> findAllByCreatedAtAfter(String createdAt, Pageable pageable);
 
 
     //
@@ -56,16 +56,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<GameView> userHasGames(Long id);
 
 
-    @Query(value = "select status " +
+    @Query(value = "select distinct status " +
             "from users_games " +
-            "where user_id =?1 and game_id = ?2 ", nativeQuery = true)
+            "where user_id =?1 and game_id = ?2 and dlc_id is null ", nativeQuery = true)
     String userHasGameStatus(Long user_id, Long game_id);
 
 
     @Query(value = "select * " +
             "from game " +
             "where tag = ?2 and " +
-            "id in (select game_id from users_games where user_id = ?1)", nativeQuery = true)
+            "id in (select distinct game_id from users_games where user_id = ?1)", nativeQuery = true)
     List<GameView> userHasGamesWithTag(Long id, String tag);
 
 
@@ -83,7 +83,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "(select id " +
             "from game " +
             "where id = ?2 " +
-            "and developer_id = ?1)) ", nativeQuery = true)
+            "and developer_id = ?1) and dlc_id is null) ", nativeQuery = true)
     List<UserView> getPlayerToGame(Long dev, Long game_id);
 
 

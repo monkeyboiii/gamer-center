@@ -72,6 +72,10 @@ public class GameServiceImpl implements GameService {
         return (game != null && game.getId() != id);
     }
 
+    @Override
+    public Game findByName(String name){
+        return gameRepository.findByName(name);
+    }
 
 /*    @Override
     public GameDiscount setDiscount(GameDiscount gameDiscount, long gameId) {
