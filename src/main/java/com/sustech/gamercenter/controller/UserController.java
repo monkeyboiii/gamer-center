@@ -37,14 +37,14 @@ public class UserController {
     UserService userService;
 
 
-    @AuthToken()
+    @AuthToken
     @GetMapping("/info")
     public JsonResponse getUserInfo(@RequestHeader("token") String token) throws InvalidTokenException {
         return new JsonResponse(0, "Success", userService.getUserInfo(token));
     }
 
 
-    @AuthToken(role = "p")
+    @AuthToken
     @GetMapping("/game")
     public JsonResponse userHasGames(@RequestHeader("token") String token,
                                      @RequestParam(value = "tag", defaultValue = "", required = false) String tag,
@@ -55,14 +55,14 @@ public class UserController {
     }
 
 
-    @AuthToken(role = "p")
+    @AuthToken
     @GetMapping("/game/tag")
     public JsonResponse userHasGameTags(@RequestHeader("token") String token) throws InvalidTokenException {
         return new JsonResponse(0, "Successfully retrieved", userService.userHasGameTags(token));
     }
 
 
-    @AuthToken(role = "p")
+    @AuthToken
     @PostMapping("/collection/upload")
     public JsonResponse uploadCollection(@RequestHeader("token") String token,
                                          @RequestParam(value = "name", defaultValue = "", required = false) String name,
@@ -73,7 +73,7 @@ public class UserController {
     }
 
 
-    @AuthToken(role = "p")
+    @AuthToken
     @GetMapping("/collection")
     public JsonResponse getCollection(@RequestHeader("token") String token,
                                       @RequestParam(value = "type", defaultValue = "", required = false) String type) throws InvalidTokenException {
@@ -105,19 +105,19 @@ public class UserController {
                                       @RequestParam(value = "type", defaultValue = "chat", required = false) String type,
                                       @RequestParam("message") String message,
                                       @RequestParam(value = "to", required = false) String to_name,
-                                      @RequestParam(value = "to_id",defaultValue = "-1",required = false) Long to_id
+                                      @RequestParam(value = "to_id", defaultValue = "-1", required = false) Long to_id
     ) throws InvalidTokenException, UserNotFoundException {
-        if(!StringUtils.isEmpty(to_name))
+        if (!StringUtils.isEmpty(to_name))
             userService.sendMessageTo(token, to_name, type, message);
-        else if(to_id != null)
+        else if (to_id != null)
             userService.sendMessageTo(token, to_id, type, message);
         else
-            return new JsonResponse(-1,"Either user name or user id is required");
+            return new JsonResponse(-1, "Either user name or user id is required");
 
         return new JsonResponse(0, "Successfully sent");
     }
 
-    @AuthToken(role = "p")
+    @AuthToken
     @PostMapping("/message/read")
     public JsonResponse readMessage(@RequestParam("id") Long id) {
         userService.readMessage(id);
@@ -125,7 +125,7 @@ public class UserController {
     }
 
 
-    @AuthToken(role = "p")
+    @AuthToken
     @PostMapping("/friend/request")
     public JsonResponse sendFriendRequest(@RequestHeader("token") String token,
                                           @RequestParam(value = "user_id", required = false) Long id,
@@ -144,7 +144,7 @@ public class UserController {
     }
 
 
-    @AuthToken(role = "p")
+    @AuthToken
     @PostMapping("/friend/confirm")
     public JsonResponse confirmFriendRequest(@RequestHeader("token") String token,
                                              @RequestParam("from") Long from) throws InvalidTokenException {
@@ -189,7 +189,7 @@ public class UserController {
     // oauth
 
 
-    @AuthToken(role = "p")
+    @AuthToken
     @PostMapping("/oauth")
     public JsonResponse oAuth(@RequestHeader("token") String token,
                               @RequestParam("game_id") Long game_id) throws InvalidTokenException {
@@ -255,7 +255,7 @@ public class UserController {
     // edit
 
 
-    @AuthToken(role = "p")
+    @AuthToken
     @PostMapping("/edit/email")
     public JsonResponse changeEmail(@RequestHeader("token") String token,
                                     @RequestParam("email") String email) throws InvalidTokenException, UserNotFoundException, EmailNotSendException {
@@ -264,7 +264,7 @@ public class UserController {
     }
 
 
-    @AuthToken(role = "p")
+    @AuthToken
     @PostMapping("/edit/email/confirm")
     public JsonResponse changeEmailConfirm(@RequestHeader("token") String token,
                                            @RequestParam("email") String email,
@@ -273,7 +273,7 @@ public class UserController {
         return new JsonResponse(0, "Successfully changed");
     }
 
-    @AuthToken(role = "p")
+    @AuthToken
     @PostMapping("/edit/password")
     public JsonResponse changePassword(@RequestHeader("token") String token,
                                        @RequestParam("old_password") String old_password,
@@ -283,7 +283,7 @@ public class UserController {
     }
 
 
-    @AuthToken(role = "p")
+    @AuthToken
     @PostMapping("/edit/bio")
     public JsonResponse changeBio(@RequestHeader("token") String token,
                                   @RequestParam("bio") String bio) throws UserNotFoundException, InvalidTokenException {
@@ -292,7 +292,7 @@ public class UserController {
     }
 
 
-    @AuthToken(role = "p")
+    @AuthToken
     @PostMapping("/edit/balance")
     public JsonResponse changeBalance(@RequestHeader("token") String token,
                                       @RequestParam("amount") Double amount
@@ -308,7 +308,7 @@ public class UserController {
     // avatar
 
 
-    @GetMapping(value = "/avatar/{id:[0-9]+}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @GetMapping(value = "/avatar/{id:[0-9]+}", produces = {MediaType.IMAGE_JPEG_VALUE,MediaType.IMAGE_PNG_VALUE,MediaType.IMAGE_GIF_VALUE})
     public byte[] getAvatar(@PathVariable("id") String id) throws IOException {
         return userService.getAvatar(id);
     }
@@ -337,7 +337,7 @@ public class UserController {
 
 
     @AuthToken
-    @PostMapping
+    @PostMapping("/comment/report")
     public JsonResponse reportComment(@RequestHeader("token") String token,
                                       @RequestParam("comment_id") Long comment_id,
                                       @RequestParam(value = "reason", defaultValue = "inappropriate content", required = false) String reason) throws InvalidTokenException {

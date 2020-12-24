@@ -1,6 +1,9 @@
 package com.sustech.gamercenter.service;
 
 import com.sustech.gamercenter.dao.GameCommentRepository;
+import com.sustech.gamercenter.dao.GameRepository;
+import com.sustech.gamercenter.dao.projection.GameCommentView;
+import com.sustech.gamercenter.model.Game;
 import com.sustech.gamercenter.model.GameComment;
 import com.sustech.gamercenter.service.token.SimpleTokenService;
 import com.sustech.gamercenter.util.exception.DuplicateCommentException;
@@ -16,6 +19,9 @@ public class GameCommentServiceImpl implements GameCommentService {
     private GameCommentRepository gameCommentRepository;
 
     @Autowired
+    private GameRepository gameRepository;
+
+    @Autowired
     private SimpleTokenService tokenService;
 
     @Override
@@ -26,14 +32,21 @@ public class GameCommentServiceImpl implements GameCommentService {
         double grade = gameComment.getGrade();
 
         try {
-            return gameCommentRepository.addComment(UID, GID, content, grade);
+            int t = gameCommentRepository.addComment(UID, GID, content, grade);
+
+            int size = getCommentByGame(GID).size();
+            Game game = gameRepository.getOne(GID);
+            game.setScore((game.getScore() * size + grade) / (size + 1));
+            gameRepository.flush();
+
+            return t;
         } catch (Exception exception) {
             throw new DuplicateCommentException("User has already commented");
         }
     }
 
     @Override
-    public List<GameComment> getCommentByGame(long GID) {
+    public List<GameCommentView> getCommentByGame(long GID) {
         return gameCommentRepository.getCommentByGame(GID);
     }
 

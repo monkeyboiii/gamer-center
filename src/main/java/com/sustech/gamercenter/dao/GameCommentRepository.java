@@ -1,6 +1,7 @@
 package com.sustech.gamercenter.dao;
 
 import com.sustech.gamercenter.dao.projection.CommentStat;
+import com.sustech.gamercenter.dao.projection.GameCommentView;
 import com.sustech.gamercenter.model.GameComment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -28,8 +29,18 @@ public interface GameCommentRepository extends JpaRepository<GameComment, Long> 
     List<GameComment> getCommentByUser(long UID);
 
 
-    @Query(value = "select * from game_comment where game_id = ?1 and visible = true ", nativeQuery = true)
-    List<GameComment> getCommentByGame(long GID);
+    @Query(value = "select gc.id as id," +
+            "gc.game_id as game_id, " +
+            "gc.content as content, " +
+            "gc.created_at as createAt," +
+            "gc.grade as grade, " +
+            "u.id as user_id, " +
+            "u.name as user_name, " +
+            "u.avatar as avatar " +
+            "from game_comment gc " +
+            "left join users u on gc.user_id = u.id " +
+            "where game_id = ?1 and visible = true ", nativeQuery = true)
+    List<GameCommentView> getCommentByGame(long GID);
 
 
     @Query(value = "select * from game_comment where visible = true ", nativeQuery = true)
@@ -38,7 +49,7 @@ public interface GameCommentRepository extends JpaRepository<GameComment, Long> 
 
     @Transactional
     @Modifying
-    @Query(value = "update game_comment set visible = False where id = :game_comment_id", nativeQuery = true)
+    @Query(value = "update game_comment set visible = false where id = :game_comment_id", nativeQuery = true)
     int deleteComment(long game_comment_id);
 
 
@@ -73,5 +84,12 @@ public interface GameCommentRepository extends JpaRepository<GameComment, Long> 
             "group by cr.comment_id " +
             "limit ?2 offset ?1 ", nativeQuery = true)
     List<CommentStat> getCommentStat(Integer offset, Integer pageSize);
+
+
+    @Modifying
+    @Query(value = "update comment_report " +
+            "set resolved = true where comment_id = ?1 ", nativeQuery = true)
+    @Transactional
+    void commentReportSetResovled(Long comment_id);
 
 }

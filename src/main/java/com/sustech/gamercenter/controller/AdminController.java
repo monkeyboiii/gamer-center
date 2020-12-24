@@ -1,5 +1,6 @@
 package com.sustech.gamercenter.controller;
 
+import com.sustech.gamercenter.security.AuthToken;
 import com.sustech.gamercenter.service.AdminService;
 import com.sustech.gamercenter.service.UserService;
 import com.sustech.gamercenter.util.exception.UserNotFoundException;
@@ -36,7 +37,7 @@ public class AdminController {
     }
 
 
-    //@AuthToken(role = "a")
+    @AuthToken(role = "a")
     @GetMapping("/user/info")
     public JsonResponse getUserInfo(
 //            @RequestHeader("token") String token,
@@ -127,7 +128,7 @@ public class AdminController {
     // comment
 
 
-    //@AuthToken(role = "a")
+    @AuthToken(role = "a")
     @GetMapping("/comment/report/list")
     public JsonResponse getReportedCommentList(
 //            @RequestHeader("token") String token,
@@ -141,18 +142,17 @@ public class AdminController {
     @GetMapping("/comment/report")
     public JsonResponse getReportedCommentDetail(
 //            @RequestHeader("token") String token,
-            @RequestParam("comment_id") Integer comment_id
+            @RequestParam("comment_id") Long comment_id
     ) {
-        adminService.deleteCommentById(comment_id);
-        return new JsonResponse(0, "Successfully deleted");
+        return new JsonResponse(0, "Successfully retrieved", adminService.getReportedCommentDetail(comment_id));
     }
 
 
-    //@AuthToken(role = "a")
-    @DeleteMapping("/comment")
+    @AuthToken(role = "a")
+    @PostMapping("/comment/delete")
     public JsonResponse deleteCommentById(
 //            @RequestHeader("token") String token,
-            @RequestParam("comment_id") Integer comment_id
+            @RequestParam("comment_id") Long comment_id
     ) {
         adminService.deleteCommentById(comment_id);
         return new JsonResponse(0, "Successfully deleted");

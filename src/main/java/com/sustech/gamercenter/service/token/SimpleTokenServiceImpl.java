@@ -65,6 +65,7 @@ public class SimpleTokenServiceImpl implements SimpleTokenService {
         }
     }
 
+
     @Override
     public void checkTokenRole(String token, String role) throws InvalidTokenException, UnauthorizedAttemptException {
         Long id = getIdByToken(token);

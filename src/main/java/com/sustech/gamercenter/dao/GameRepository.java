@@ -1,7 +1,6 @@
 package com.sustech.gamercenter.dao;
 
 import com.sustech.gamercenter.model.Game;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,21 +16,33 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
 //    List<Game> findByTag(String tag);
 
-    @Query(value = "select * from game g where g.announce_date <= :today and g.tag=:tag and g.name like CONCAT('%',:name,'%')", nativeQuery = true)
-    Page<Game> findByTagOrNameLike(@Param("tag") String tag, @Param("name") String name,
-                                   @Param("today") String today, Pageable pageable);
+    @Query(value = "select * " +
+            "from game g " +
+            "where g.announce_date <= ?3 and g.tag = ?1 and g.name like CONCAT('%', ?2 ,'%')", nativeQuery = true)
+    Page<Game> findByTagOrNameLike(String tag, String name,
+                                   String today, Pageable pageable);
 
-    @Query(value = "select * from game g where g.announce_date <= :today and g.tag=:tag", nativeQuery = true)
-    Page<Game> findAllByTag(String tag, @Param("today") String today, Pageable pageable);
 
-    @Query(value = "select * from game g where g.announce_date <= :today and g.name like CONCAT('%',:name,'%')", nativeQuery = true)
-    Page<Game> findAllByNameLike(String name, @Param("today") String today, Pageable pageable);
+    @Query(value = "select * " +
+            "from game g " +
+            "where g.announce_date <= ?2 and g.tag = ?1 ", nativeQuery = true)
+    Page<Game> findAllByTag(String tag, String today, Pageable pageable);
 
-    @Query(value = "select * from game g where g.announce_date <= :today", nativeQuery = true)
-    Page<Game> findAllGame(@Param("today") String today, Pageable pageable);
+
+    @Query(value = "select * " +
+            "from game g " +
+            "where g.announce_date <= ?2 and g.name like CONCAT('%', ?1 ,'%')", nativeQuery = true)
+    Page<Game> findAllByNameLike(String name, String today, Pageable pageable);
+
+
+    @Query(value = "select * " +
+            "from game g " +
+            "where g.announce_date <= ?1 ", nativeQuery = true)
+    Page<Game> findAllGame(String today, Pageable pageable);
 
 
     List<Game> findAllByDeveloperIdAndTagIgnoreCase(Long id, String tag);
+
 
     List<Game> findAllByDeveloperId(Long id);
 }

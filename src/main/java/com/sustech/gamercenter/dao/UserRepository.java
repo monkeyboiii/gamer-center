@@ -157,12 +157,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     void createOAuthToken(Long user_id, Long game_id, String token);
 
 
-    @Query(value = "SELECT " +
-            "EXISTS " +
-            "(SELECT * FROM users_games_tokens WHERE token = ?1) ", nativeQuery = true)
-    int validateOAuthToken(String oAuthToken);
-
-
     @Query(value = "select distinct user_id " +
             "from users_games " +
             "where game_id = ?1 ", nativeQuery = true)

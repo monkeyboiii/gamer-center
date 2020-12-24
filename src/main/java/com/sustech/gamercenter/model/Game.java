@@ -1,10 +1,12 @@
 package com.sustech.gamercenter.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.List;
+
 
 @Entity
 public class Game {

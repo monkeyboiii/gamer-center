@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -42,6 +43,8 @@ public interface GameService {
     void cloudDownload(HttpServletResponse response, long gameId, long userId, String fileName) throws IOException;
 
     void getCloudList(HttpServletResponse response, long gameId, long userId) throws IOException;
+
+    List<String> listCloudSave(Long game_id, Long user_id) throws FileNotFoundException;
 
 
     //

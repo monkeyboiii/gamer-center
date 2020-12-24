@@ -116,10 +116,4 @@ public class DeveloperService {
     }
 
 
-    public boolean validateOAuthToken(String oAuthToken) {
-        userRepository.validateOAuthToken(oAuthToken);
-        return true;
-    }
-
-
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +64,9 @@ public class GameController {
     }
 
     @GetMapping("/list")
-    public Object search(@RequestParam("tag") String tag, @RequestParam("name") String name, @RequestParam("page") int page) {
+    public Object search(@RequestParam(value = "tag", defaultValue = "", required = false) String tag,
+                         @RequestParam(value = "name", defaultValue = "", required = false) String name,
+                         @RequestParam(value = "page", defaultValue = "0", required = false) int page) {
         return ResultService.success(gameService.search(tag, name, page));
 //        return ResultService.success(gameService.search(tag, name));
     }
@@ -82,13 +85,15 @@ public class GameController {
 
 
     @PostMapping("/upload")
-    public Object fileUpload(@RequestParam("id") long id, @RequestParam("upload_file") MultipartFile uploadPackage, @RequestParam("type") String type) throws IOException {
+    public Object fileUpload(@RequestParam("id") long id,
+                             @RequestParam("upload_file") MultipartFile uploadPackage,
+                             @RequestParam("type") String type) throws IOException {
         gameService.uploadFile(type, uploadPackage, id);
         return ResultService.success("");
     }
 
 
-    @GetMapping(value = "/getPhoto/{url:.+}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @GetMapping(value = "/getPhoto/{url:.+}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_GIF_VALUE})
     public byte[] getPhoto(@PathVariable("url") String url) throws IOException {
         return gameService.getFile(url, "image");
     }
@@ -99,10 +104,18 @@ public class GameController {
     }
 
     @GetMapping("/download")
-    public Object fileDownLoad(HttpServletResponse response, @RequestParam("name") String fileName,
-                               @RequestParam("type") String type) throws IOException {
+    public void fileDownLoad(HttpServletResponse response,
+                             @RequestParam("name") String fileName,
+                             @RequestParam("type") String type) throws IOException {
         gameService.download(response, fileName, type);
-        return ResultService.success("");
+    }
+
+
+    @AuthToken
+    @GetMapping("cloud/list")
+    public JsonResponse listCloudSave(@RequestParam("game_id") Long game_id,
+                                      @RequestParam("user_id") Long user_id) throws FileNotFoundException {
+        return new JsonResponse(0, "Success", gameService.listCloudSave(game_id, user_id));
     }
 
 
@@ -115,11 +128,10 @@ public class GameController {
 
 
     @GetMapping("/cloudDownload")
-    public Object cloudDownload(HttpServletResponse response, @RequestParam("game_id") long gameId,
-                                @RequestParam("user_id") long userId, @RequestParam("name") String fileName)
-            throws IOException {
+    public void cloudDownload(HttpServletResponse response, @RequestParam("game_id") long gameId,
+                              @RequestParam("user_id") long userId, @RequestParam("name") String fileName) throws IOException {
+        response.setHeader("Content-Type", "application/octet-stream;charset=utf-8");
         gameService.cloudDownload(response, gameId, userId, fileName);
-        return ResultService.success("");
     }
 
 
@@ -196,6 +208,7 @@ public class GameController {
     }
 
 
+    @AuthToken(role = "p")
     @PostMapping("/dlc/purchase")
     public JsonResponse purchaseDLC(@RequestHeader("token") String token,
                                     @RequestParam("id") Long id) throws InvalidTokenException, InsufficientBalanceException, UserNotFoundException {

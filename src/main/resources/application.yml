@@ -1,15 +1,16 @@
 server:
   port: 80
+  servlet:
+    encoding:
+      force: true
+      charset: utf-8
+      enabled: true
+  tomcat:
+    uri-encoding: UTF-8
 
 spring:
   profiles:
-    active: dev
-
-  #  datasource:
-  #    driver-class-name: com.mysql.cj.jdbc.Driver
-  #    url: jdbc:mysql://47.115.76.10:3306/ooad_project?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT
-  #    username: ooad
-  #    password: ooadpassword
+    active: prod
 
   jpa:
     hibernate:
@@ -17,10 +18,6 @@ spring:
     show-sql: true
 
   redis:
-    database: 0
-    host: 127.0.0.1
-    port: 6379
-    password:
     timeout: 3000
     lettuce:
       pool:
@@ -29,15 +26,17 @@ spring:
         max-idle: 8
         min-idle: 0
 
+  data:
+    redis:
+      repositories:
+        enabled: false
+
   jackson:
     default-property-inclusion: non_null
     serialization:
       fail-on-empty-beans: false
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
-
-  devtools:
-    add-properties: true
 
   servlet:
     multipart:
@@ -47,3 +46,17 @@ spring:
       max-request-size: 5000MB
       resolve-lazily: false
       file-size-threshold: 0
+
+  mail:
+    default-encoding: utf-8
+    port: 465
+    protocol: smtps
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enabled: true
+          auth: true
+          starttls:
+            enable: true
+            required: true

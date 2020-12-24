@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.FileNotFoundException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.List;
 
 @RestController
@@ -86,11 +87,41 @@ public class DeveloperController {
     //
     //
 
+    private static final String STORAGE = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static";
+    private final static String SDK_NAME = "gamer-center-developer-sdk-1.0-SNAPSHOT-jar-with-dependencies.jar";
+
+
+    @GetMapping("/sdk/download")
+    public JsonResponse downloadSDK(HttpServletResponse response) {
+        File file = new File(STORAGE + File.separator + SDK_NAME);
+        if (!file.exists()) {
+            return new JsonResponse(-1, "No SDK file available");
+        }
+
+        response.reset();
+        response.setContentType("application/octet-stream");
+        response.setCharacterEncoding("utf-8");
+        response.setContentLength((int) file.length());
+        response.setHeader("Content-Disposition", "attachment;filename=" + SDK_NAME);
+
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
+            byte[] buff = new byte[1024];
+            OutputStream os = response.getOutputStream();
+            int i = 0;
+            while ((i = bis.read(buff)) != -1) {
+                os.write(buff, 0, i);
+                os.flush();
+            }
+        } catch (IOException e) {
+            return new JsonResponse(-1, "Download failed");
+        }
+        return new JsonResponse(0, "Successfully downloaded");
+    }
+
 
     @AuthToken(role = "d")
     @GetMapping("/player/info")
     public JsonResponse getPlayerInfo(@RequestParam("oauth") String oathToken) {
-
         return new JsonResponse(0, "success");
     }
 

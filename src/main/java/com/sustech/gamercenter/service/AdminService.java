@@ -148,14 +148,21 @@ public class AdminService {
         }
     }
 
-    public void deleteCommentById(Integer comment_id) {
+    public void deleteCommentById(Long comment_id) {
         Optional<GameComment> gameComment = gameCommentRepository.findById(comment_id);
         if (gameComment.isPresent()) {
-            gameCommentRepository.delete(gameComment.get());
+            gameCommentRepository.commentReportSetResovled(gameComment.get().getId());
+
+//            gameCommentRepository.delete(gameComment.get());
+            gameComment.get().setVisible(false);
             gameCommentRepository.flush();
         } else {
             throw new EntityNotFoundException("Comment of id # " + comment_id.toString() + " is not present");
         }
+    }
+
+    public GameComment getReportedCommentDetail(Long comment_id) {
+        return gameCommentRepository.getOne(comment_id);
     }
 
     public List<CommentStat> getReportedCommentList(Integer pageNum, Integer pageSize) {

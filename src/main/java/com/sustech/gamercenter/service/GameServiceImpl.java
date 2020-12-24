@@ -21,8 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 //import com.sustech.gamercenter.dao.GameDiscountRepository;
 //import com.sustech.gamercenter.model.GameDiscount;
@@ -126,7 +128,7 @@ public class GameServiceImpl implements GameService {
 
     private final static String STORAGE_PREFIX = System.getProperty("user.dir");
     private final static String RESOURCE_STATIC = STORAGE_PREFIX + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static";
-    private final static String RELATIVE_GAME = File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static" + File.separator + "game";
+    private final static String RELATIVE_GAME = "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static" + File.separator + "game";
     private final static String GAME = RESOURCE_STATIC + File.separator + "game";
     private final static String CLOUD = RESOURCE_STATIC + File.separator + "cloud";
     private final static String GAME_DLC = GAME + File.separator + "dlc";
@@ -135,14 +137,19 @@ public class GameServiceImpl implements GameService {
     @Override
     public void uploadFile(String type, MultipartFile uploadFile, long id) throws IOException {
         String path = GAME + File.separator + type;
-        File dir = new File(RELATIVE_GAME + type);
+        File dir = new File(path);
         String filename = System.currentTimeMillis() + uploadFile.getOriginalFilename();
         File fileServer = new File(dir, filename);
+        String relative = RELATIVE_GAME + File.separator + filename;
+        if (!fileServer.exists()) {
+            fileServer.createNewFile();
+        }
         uploadFile.transferTo(fileServer);
+
 
         GameContent g = new GameContent();
         g.setName(filename);
-        g.setPath(path);
+        g.setPath(relative);
         g.setType(type);
         g.setGameId(id);
         gameContentRepository.save(g);
@@ -246,6 +253,18 @@ public class GameServiceImpl implements GameService {
     }
 
 
+    @Override
+    public List<String> listCloudSave(Long gameId, Long userId) throws FileNotFoundException {
+        String path = CLOUD + File.separator + gameId + File.separator + userId + File.separator;
+        File file = new File(path);
+        if (file.exists()) {
+            return Arrays.stream(file.list()).collect(Collectors.toList());
+        } else {
+            throw new FileNotFoundException("No cloud record found");
+        }
+    }
+
+
     //
     //
     //
@@ -279,8 +298,8 @@ public class GameServiceImpl implements GameService {
         Long game_id = gameDLC.getId();
         String ext = Objects.requireNonNull(file.getOriginalFilename()).split("\\.")[1];
 
-        String path = File.separator + game_id + "-" + gameDLC.getName() + "." + ext;
-        File content = new File(GAME_DLC + path);
+        String path = game_id + "-" + gameDLC.getName() + "." + ext;
+        File content = new File(GAME_DLC + File.separator + path);
         gameDLC.setPath(path);
 
         if (content.exists()) {

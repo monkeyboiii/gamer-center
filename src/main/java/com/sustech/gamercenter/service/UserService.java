@@ -270,7 +270,7 @@ public class UserService {
         User payee = queryUserById(to);
         Double balance = payer.getBalance();
         if (balance < amount) {
-            throw new InsufficientBalanceException("User  " + payer.getName() + " has no sufficient balance");
+            throw new InsufficientBalanceException("User " + payer.getName() + " has no sufficient balance");
         }
 
         payer.setBalance(balance - amount);
