@@ -32,13 +32,12 @@ public class GameCommentServiceImpl implements GameCommentService {
         double grade = gameComment.getGrade();
 
         try {
-            int t = gameCommentRepository.addComment(UID, GID, content, grade);
-
             int size = getCommentByGame(GID).size();
             Game game = gameRepository.getOne(GID);
             game.setScore((game.getScore() * size + grade) / (size + 1));
-            gameRepository.flush();
 
+            int t = gameCommentRepository.addComment(UID, GID, content, grade);
+            gameRepository.flush();
             return t;
         } catch (Exception exception) {
             throw new DuplicateCommentException("User has already commented");

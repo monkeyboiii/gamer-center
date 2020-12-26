@@ -241,6 +241,12 @@ public class UserController {
     }
 
 
+    @GetMapping("/other")
+    public JsonResponse getUserInfo(@RequestParam("user_id") Long user_id) throws InvalidTokenException {
+        return new JsonResponse(0, "Success", userService.getUserInfoForOther(user_id));
+    }
+
+
     @PostMapping("/register")
     public JsonResponse register(@RequestParam("name") String name,
                                  @RequestParam("email") String email,

@@ -314,6 +314,13 @@ public class UserService {
                 .build();
     }
 
+    public UserInfo getUserInfoForOther(Long id) throws InvalidTokenException {
+        return new UserInfo.builder()
+                .user(userRepository.getOne(id))
+                .friends(userRepository.userHasFriends(id))
+                .build();
+    }
+
     private Long purchase(Long userId, Long devId, Long gameId, Double price) throws InsufficientBalanceException, UserNotFoundException {
         // actual transferring
         transfer(price, userId, devId);
